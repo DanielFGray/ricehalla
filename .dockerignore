@@ -1,0 +1,14 @@
+# add git-ignore syntax here of things you don't want copied into docker image
+
+.git
+Dockerfile
+node_modules
+dist
+public
+*.sqlite3
+.eslintcache
+*.log
+.tern-port
+.tern-project
+README
+.gitignore

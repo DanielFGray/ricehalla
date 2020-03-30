@@ -1,0 +1,3 @@
+mutation DesktopDelete ($id: Int!) {
+  DesktopDelete(id: $id)
+}

@@ -1,0 +1,59 @@
+{
+  "compilerOptions": {
+    "incremental": false,
+    "target": "ESNext",
+    "module": "ESNext",
+    // "lib": [],
+    "allowJs": true,
+    "checkJs": true,
+    "jsx": "preserve",
+    "declaration": true,
+    // "declarationMap": true,
+    // "sourceMap": true,
+    // "outFile": "./",
+    // "outDir": "./",
+    "rootDir": "./src",
+    // "composite": true,
+    // "tsBuildInfoFile": "./node_modules/tsccache",
+    // "removeComments": true,
+    "noEmit": true,
+    "importHelpers": true,
+    // "downlevelIteration": true,
+    "isolatedModules": false,
+
+    "strict": true,
+    // "noImplicitAny": true,
+    // "strictNullChecks": true,
+    // "strictFunctionTypes": true,
+    // "strictBindCallApply": true,
+    // "strictPropertyInitialization": true,
+    // "noImplicitThis": true,
+    // "alwaysStrict": true,
+
+    // "noUnusedLocals": true,
+    // "noUnusedParameters": true,
+    // "noImplicitReturns": true,
+    // "noFallthroughCasesInSwitch": true,
+
+    "moduleResolution": "node",
+    // "baseUrl": "./",
+    // "paths": {},
+    // "rootDirs": [],
+    // "typeRoots": [],
+    // "types": [],
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    // "preserveSymlinks": true,
+    // "allowUmdGlobalAccess": true,
+
+    // "sourceRoot": "",
+    // "mapRoot": "",
+    // "inlineSourceMap": true,
+    // "inlineSources": true,
+
+    // "experimentalDecorators": true,
+    // "emitDecoratorMetadata": true,
+
+    "forceConsistentCasingInFileNames": true
+  }
+}

@@ -1,0 +1,29 @@
+version: "2"
+
+networks:
+  appnet:
+
+services:
+  db:
+    image: postgres:alpine
+    environment:
+      - POSTGRES_DB=ricehalla
+    networks:
+      - appnet
+    ports:
+      - 5432:5432
+    labels:
+      - "traefik.enable=false"
+
+  nodeapp:
+    build: .
+    container_name: nodeapp
+    networks:
+      - appnet
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.nodeapp.rule=Host(`localhost`)"
+      - "traefik.http.services.nodeapp.loadbalancer.server.port=3000"
+      - "traefik.http.routers.nodeapp.entrypoints=web"
+      - "traefik.http.routers.nodeapp.tls.certresolver=mydnschallenge"
+      - "traefik.http.middlewares.nodeapp.redirectscheme.scheme=https"

@@ -1,0 +1,10 @@
+*.log
+public
+dist
+node_modules/
+.eslintcache
+.node_repl_history
+.tern-port
+secrets.js
+*.sqlite3
+localhost*.pem

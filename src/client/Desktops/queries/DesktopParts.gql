@@ -1,0 +1,8 @@
+fragment DesktopParts on Desktop {
+  id
+  title
+  description
+  urls
+  created_at
+  updated_at
+}

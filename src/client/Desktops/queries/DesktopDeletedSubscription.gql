@@ -1,0 +1,3 @@
+subscription DesktopDeleted {
+  DesktopDeleted
+}

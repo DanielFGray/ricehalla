@@ -1,0 +1,24 @@
+type Desktop {
+  id: Int!
+  title: String!
+  urls: [String!]!
+  description: String
+  created_at: String!
+  updated_at: String!
+}
+
+type Query {
+  DesktopList: [Desktop]
+}
+
+type Mutation {
+  DesktopCreate(title: String!, description: String, urls: [String!]!): Desktop
+  DesktopUpdate(id: Int!, title: String, description: String, urls: [String]): Desktop
+  DesktopDelete(id: Int!): Int!
+}
+
+type Subscription {
+  DesktopCreated: Desktop
+  DesktopUpdated: Desktop
+  DesktopDeleted: Int!
+}

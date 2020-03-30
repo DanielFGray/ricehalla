@@ -1,0 +1,6 @@
+#import "./DesktopParts.gql"
+subscription DesktopUpdated {
+  DesktopUpdated {
+    ...DesktopParts
+  }
+}
