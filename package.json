@@ -13,6 +13,10 @@
     "lint:js": "eslint --cache --ext=.js,.jsx,.ts,.tsx --ignore-path=.gitignore --fix .",
     "lint": "run-p lint:*",
     "test": "run-s lint",
+    "docker:db": "docker-compose up -d db ",
+    "migrate:latest": "knex migrate:latest",
+    "seed:run": "knex seed:run",
+    "db": "run-s docker:db migrate:latest seed:run",
     "gentypes": "graphql-codegen",
     "gentypes:w": "graphql-codegen -w"
   },

@@ -11,14 +11,14 @@ exports.seed
       .filter(x => x.dtops && x.dtops.length)
       .map(({ nick, dtops, dotfiles, distros }) => ({
         title: nick,
+        urls: dtops.filter(x => x.startsWith('http')).map(x => x.replace(/\s.*$/)),
         description:
         `${dotfiles
           && `# dotfiles:\n${dotfiles
             .filter(x => x.startsWith('http'))
             .map(d => `* ${d}\n`)
-            .join('')}` || ''.trim()}${distros
+            .join('')}`.trim() || ''}${distros
           && `\n# distros:\n${distros.map(d => `* ${d}\n`).join('')}` || ''}`.trim() || null,
-        urls: dtops.filter(x => x.startsWith('http').map(x => x.replace(/\s.*$/))),
       }))
     return knex('desktops').insert(users)
   }

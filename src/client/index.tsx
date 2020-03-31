@@ -56,7 +56,8 @@ export default function main() {
   // loadableReady(() => {
   const el = document.getElementById(MOUNT)
   if (! el) throw new Error(`could not find render element with id ${MOUNT}`)
-    ReactDOM.hydrate(<App />, Init)
+  console.log('loading')
+  ReactDOM.hydrate(<App />, Init)
   // })
 }
 
