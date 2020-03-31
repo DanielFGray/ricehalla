@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import { ApolloError } from 'apollo-client'
 import {
   useDesktopListQuery,
   useDesktopCreateMutation,
@@ -11,7 +12,6 @@ import {
   DesktopCreateMutationVariables,
   // DesktopUpdateMutationVariables,
 } from '../../generated-types'
-import {ApolloError} from 'apollo-client'
 
 export default function useDesktops() {
   const { data, refetch, error: errorQuery } = useDesktopListQuery()
@@ -19,39 +19,38 @@ export default function useDesktops() {
   // const [UpdateDesktop, { error: errorUpdate }] = useDesktopUpdateMutation()
   // const [DeleteDesktop, { error: errorDel }] = useDesktopDeleteMutation()
 
-  const createDesktop = ({ description, title, urls }: DesktopCreateMutationVariables) =>
-    CreateDesktop({
-      variables: { description, title, urls },
-      optimisticResponse: {
-        __typename: 'Mutation',
-        DesktopCreate: {
-          __typename: 'Desktop',
-          description,
-          title,
-          urls,
-        },
+  const createDesktop = ({ description, title, urls }: DesktopCreateMutationVariables) => CreateDesktop({
+    variables: { description, title, urls },
+    optimisticResponse: {
+      __typename: 'Mutation',
+      DesktopCreate: {
+        __typename: 'Desktop',
+        description,
+        title,
+        urls,
       },
-      update: (proxy, result) => {
-        const created = result.data.DesktopCreate
-        const cache = proxy.readQuery({ query: DesktopListDocument })
-        // const exists = cache.DesktopList.findIndex(e => e.id === created.id)
-        // if (exists > -1) return
-        const DesktopList = [created, ...cache.DesktopList]
-        proxy.writeQuery({
-          query: DesktopListDocument,
-          data: { DesktopList },
-        })
-      },
-    })
+    },
+    update: (proxy, result) => {
+      const created = result.data.DesktopCreate
+      const cache = proxy.readQuery({ query: DesktopListDocument })
+      // const exists = cache.Desktop.findIndex(e => e.id === created.id)
+      // if (exists > -1) return
+      const DesktopList = [created, ...cache.Desktop]
+      proxy.writeQuery({
+        query: DesktopListDocument,
+        data: { DesktopList },
+      })
+    },
+  })
 
   const { error: creSubErr } = useDesktopCreatedSubscription({
     onSubscriptionData: ({ client, subscriptionData }) => {
       const created = subscriptionData.data?.DesktopCreated
-      if (!created) return
+      if (! created) return
       const cache = client.readQuery({ query: DesktopListDocument })
-      const idx = cache.DesktopList.findIndex(e => e.id === created)
+      const idx = cache.Desktop.findIndex(e => e.id === created)
       if (idx < 0) return
-      const DesktopList = [...cache.DesktopList.slice(0, idx), ...cache.DesktopList.slice(idx + 1)]
+      const DesktopList = [...cache.Desktop.slice(0, idx), ...cache.Desktop.slice(idx + 1)]
       client.writeQuery({
         query: DesktopListDocument,
         data: { DesktopList },
@@ -64,9 +63,9 @@ export default function useDesktops() {
   //     const deleted = subscriptionData.data?.DesktopDeleted
   //     if (!deleted) return
   //     const cache = client.readQuery({ query: DesktopListDocument })
-  //     const idx = cache.DesktopList.findIndex(e => e.id === deleted)
+  //     const idx = cache.Desktop.findIndex(e => e.id === deleted)
   //     if (idx < 0) return
-  //     const DesktopList = [...cache.DesktopList.slice(0, idx), ...cache.DesktopList.slice(idx + 1)]
+  //     const DesktopList = [...cache.Desktop.slice(0, idx), ...cache.Desktop.slice(idx + 1)]
   //     client.writeQuery({
   //       query: DesktopListDocument,
   //       data: { DesktopList },
@@ -79,12 +78,12 @@ export default function useDesktops() {
   //     const updated = subscriptionData.data?.DesktopUpdated
   //     if (!updated) return
   //     const cache = client.readQuery({ query: DesktopListDocument })
-  //     const idx = cache.DesktopList.findIndex(e => e.id === updated.id)
+  //     const idx = cache.Desktop.findIndex(e => e.id === updated.id)
   //     if (idx < 0) return
   //     const DesktopList = [
-  //       ...cache.DesktopList.slice(0, idx),
+  //       ...cache.Desktop.slice(0, idx),
   //       subscriptionData.data.DesktopUpdated,
-  //       ...cache.DesktopList.slice(idx + 1),
+  //       ...cache.Desktop.slice(idx + 1),
   //     ]
   //     client.writeQuery({
   //       query: DesktopListDocument,
@@ -107,7 +106,7 @@ export default function useDesktops() {
     return [c]
   }, undefined)
 
-  const listDesktops = data?.DesktopList.slice(0).sort((a, b) => b.updated_at - a.updated_at)
+  const listDesktops = data?.Desktop.slice(0).sort((a, b) => b.updated_at - a.updated_at)
 
   // const updateDesktop = ({ id, description, title, urls }: DesktopUpdateMutationVariables) =>
   //   UpdateDesktop({
@@ -124,12 +123,12 @@ export default function useDesktops() {
   //     },
   //     update: (proxy, result) => {
   //       const cache = proxy.readQuery({ query: DesktopListDocument })
-  //       const idx = cache.DesktopList.findIndex(e => e.id === id)
+  //       const idx = cache.Desktop.findIndex(e => e.id === id)
   //       if (idx < 0) return
   //       const DesktopList = [
-  //         ...cache.DesktopList.slice(0, idx),
+  //         ...cache.Desktop.slice(0, idx),
   //         result.data.DesktopUpdate,
-  //         ...cache.DesktopList.slice(idx + 1),
+  //         ...cache.Desktop.slice(idx + 1),
   //       ]
   //       proxy.writeQuery({
   //         query: DesktopListDocument,
@@ -142,11 +141,11 @@ export default function useDesktops() {
   //   variables: { id },
   //   update: proxy => {
   //     const cache = proxy.readQuery({ query: DesktopListDocument })
-  //     const idx = cache.DesktopList.findIndex(e => e.id === id)
+  //     const idx = cache.Desktop.findIndex(e => e.id === id)
   //     if (idx < 0) return
   //     const DesktopList = [
-  //       ...cache.DesktopList.slice(0, idx),
-  //       ...cache.DesktopList.slice(idx + 1),
+  //       ...cache.Desktop.slice(0, idx),
+  //       ...cache.Desktop.slice(idx + 1),
   //     ]
   //     proxy.writeQuery({
   //       query: DesktopListDocument,

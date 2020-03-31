@@ -6,9 +6,9 @@ import typeDefs from './typeDefs.gql'
 
 const pubsub = new PubSub()
 
-export const resolvers: Resolvers = {
+export const resolvers: Resolvers<Desktop> = {
   Query: {
-    DesktopList: async () => db('desktops').select(),
+    Desktop: async () => db('desktops').select(),
   },
   Mutation: {
     DesktopCreate: async (_, { title, description, urls }) => {

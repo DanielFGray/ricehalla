@@ -33,7 +33,7 @@ async function main() {
     })
   }
 
-  app({ app: koa, schema })
+  await app({ app: koa, schema })
 
   const server = http.createServer()
   server.on('request', koa.callback()) // eslint-disable-line @typescript-eslint/no-misused-promises

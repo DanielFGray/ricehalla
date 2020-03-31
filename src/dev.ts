@@ -1,13 +1,28 @@
 /* eslint-disable import/no-extraneous-dependencies, global-require */
+import { spawn } from 'child_process'
 import fetch from 'isomorphic-unfetch'
 import webpack from 'webpack'
-import compose from 'koa-compose'
 import koaWebpack from 'koa-webpack'
 import WebpackBar from 'webpackbar'
-import hotServer from './hotServerMiddleware'
+import runAll from 'npm-run-all'
+// import compose from 'koa-compose'
+// import hotServer from './hotServerMiddleware'
 import config from '../webpack.config'
 
 const { APP_URL } = process.env
+
+spawn('tput', ['clear'], { stdio: 'inherit' })
+
+const codegen = {
+  watching: null,
+  start() {
+    if (! this.watching) {
+      console.log('starting graphql-codegen')
+      this.watching = runAll(['gentypes:w'], { silent: true, stdout: process.stdout /* , printName: true */ })
+    }
+    return this.watching
+  },
+}
 
 export async function dev() {
   const multiCompiler = webpack(config)
@@ -16,8 +31,9 @@ export async function dev() {
   multiCompiler.compilers.forEach(c => {
     new WebpackBar({ profile: true }).apply(c)
 
-    c.hooks.afterEmit.tap('built', () => {
-      fetch(APP_URL).catch(console.error)
+    c.hooks.done.tap('built', () => {
+      codegen.start()
+      if (APP_URL) fetch(APP_URL).catch(console.error)
     })
   })
 
@@ -38,8 +54,9 @@ export async function dev() {
     },
   })
 
-  return compose([
-    hotClient,
-    // hotServer: hotServer(multiCompiler),
-  ])
+  return hotClient
+  // return compose([
+  //   hotClient,
+  //   hotServer: hotServer(multiCompiler),
+  // ])
 }

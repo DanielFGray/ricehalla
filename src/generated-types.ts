@@ -53,7 +53,7 @@ export type MutationDesktopDeleteArgs = {
 };
 
 export type Query = {
-  DesktopList?: Maybe<Array<Maybe<Desktop>>>;
+  Desktop?: Maybe<Array<Maybe<Desktop>>>;
 };
 
 export type Subscription = {
@@ -91,7 +91,7 @@ export type DesktopDeletedSubscription = Pick<Subscription, 'DesktopDeleted'>;
 export type DesktopListQueryVariables = {};
 
 
-export type DesktopListQuery = { DesktopList?: Maybe<Array<Maybe<DesktopPartsFragment>>> };
+export type DesktopListQuery = { Desktop?: Maybe<Array<Maybe<DesktopPartsFragment>>> };
 
 export type DesktopPartsFragment = Pick<Desktop, 'id' | 'title' | 'description' | 'urls' | 'created_at' | 'updated_at'>;
 
@@ -220,7 +220,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
 };
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
-  DesktopList?: Resolver<Maybe<Array<Maybe<ResolversTypes['Desktop']>>>, ParentType, ContextType>,
+  Desktop?: Resolver<Maybe<Array<Maybe<ResolversTypes['Desktop']>>>, ParentType, ContextType>,
 };
 
 export type SubscriptionResolvers<ContextType = any, ParentType extends ResolversParentTypes['Subscription'] = ResolversParentTypes['Subscription']> = {
@@ -342,7 +342,7 @@ export function useDesktopDeletedSubscription(baseOptions?: ApolloReactHooks.Sub
       }
 export type DesktopDeletedSubscriptionHookResult = ReturnType<typeof useDesktopDeletedSubscription>;
 export type DesktopDeletedSubscriptionResult = ApolloReactCommon.SubscriptionResult<DesktopDeletedSubscription>;
-export const DesktopListDocument: DocumentNode = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"DesktopList"},"variableDefinitions":[],"directives":[],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"DesktopList"},"arguments":[],"directives":[],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"DesktopParts"},"directives":[]}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"DesktopParts"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Desktop"}},"directives":[],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"},"arguments":[],"directives":[]},{"kind":"Field","name":{"kind":"Name","value":"title"},"arguments":[],"directives":[]},{"kind":"Field","name":{"kind":"Name","value":"description"},"arguments":[],"directives":[]},{"kind":"Field","name":{"kind":"Name","value":"urls"},"arguments":[],"directives":[]},{"kind":"Field","name":{"kind":"Name","value":"created_at"},"arguments":[],"directives":[]},{"kind":"Field","name":{"kind":"Name","value":"updated_at"},"arguments":[],"directives":[]}]}}]};
+export const DesktopListDocument: DocumentNode = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"DesktopList"},"variableDefinitions":[],"directives":[],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"Desktop"},"arguments":[],"directives":[],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"DesktopParts"},"directives":[]}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"DesktopParts"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Desktop"}},"directives":[],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"},"arguments":[],"directives":[]},{"kind":"Field","name":{"kind":"Name","value":"title"},"arguments":[],"directives":[]},{"kind":"Field","name":{"kind":"Name","value":"description"},"arguments":[],"directives":[]},{"kind":"Field","name":{"kind":"Name","value":"urls"},"arguments":[],"directives":[]},{"kind":"Field","name":{"kind":"Name","value":"created_at"},"arguments":[],"directives":[]},{"kind":"Field","name":{"kind":"Name","value":"updated_at"},"arguments":[],"directives":[]}]}}]};
 
 /**
  * __useDesktopListQuery__

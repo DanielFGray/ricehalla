@@ -11,8 +11,8 @@ import { WebSocketLink } from 'apollo-link-ws'
 // import { loadableReady } from '@loadable/component'
 import Layout from './Layout'
 
-import 'normalize.css'
-/* import './style.css' */
+/* import 'normalize.css' */
+import './style.css'
 
 const { APP_URL, APP_BASE, MOUNT } = process.env
 
@@ -25,9 +25,7 @@ export default function main() {
     if (initData) {
       cache.restore(initData)
     }
-  } catch (e) {
-    console.error('unable to load cache', e)
-  }
+  } catch (e) { console.error('unable to load cache', e) }
 
   const apolloClient = new ApolloClient({
     cache,
@@ -58,7 +56,7 @@ export default function main() {
   // loadableReady(() => {
   const el = document.getElementById(MOUNT)
   if (! el) throw new Error(`could not find render element with id ${MOUNT}`)
-  hydrate(<App />, root)
+    ReactDOM.hydrate(<App />, Init)
   // })
 }
 

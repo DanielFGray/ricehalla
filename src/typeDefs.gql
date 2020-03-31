@@ -8,7 +8,7 @@ type Desktop {
 }
 
 type Query {
-  DesktopList: [Desktop]
+  Desktop: [Desktop]
 }
 
 type Mutation {

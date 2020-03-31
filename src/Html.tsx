@@ -5,14 +5,16 @@ import type { ChunkExtractor } from '@loadable/server'
 
 const { MOUNT, NODE_ENV, APP_BASE } = process.env
 
-export default function Html({ data, html, helmet, scripts, styles, extractor }: {
-  data: any // eslint-disable-line @typescript-eslint/no-explicit-any
-  helmet: any // eslint-disable-line @typescript-eslint/no-explicit-any 
+export default function Html({ data, html, helmet, scripts = [], styles = [], extractor = null }: {
+  data: { [key: string]: any } // eslint-disable-line @typescript-eslint/no-explicit-any
+  helmet: any // eslint-disable-line @typescript-eslint/no-explicit-any
   html: string
-  scripts?: string[]
-  styles?: string[]
-  extractor?: ChunkExtractor
-}) {
+} & ({
+  scripts: string[]
+  styles: string[]
+} | {
+  extractor: ChunkExtractor
+})) {
   const Component = (
     <html lang="en" {...helmet.htmlAttributes.toString()}>
       <head>
@@ -28,10 +30,10 @@ export default function Html({ data, html, helmet, scripts, styles, extractor }:
           name="viewport"
           content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"
         />
-        {styles && styles.map(link => (
+        {styles?.map(link => (
           <link key={link} rel="stylesheet" type="text/css" href={`${APP_BASE}/${link}`} />
         ))}
-        {extractor && extractor.getStyleElements()}
+        {extractor?.getStyleElements()}
       </head>
       <body {...helmet.bodyAttributes.toComponent()}>
         <div
@@ -54,8 +56,8 @@ export default function Html({ data, html, helmet, scripts, styles, extractor }:
           />
         )}
         {helmet.script.toComponent()}
-        {extractor && extractor.getScriptElements()}
-        {scripts && scripts.map(js => (
+        {extractor?.getScriptElements()}
+        {scripts?.map(js => (
           <script
             src={`${APP_BASE}/${js}`}
             key={js}

@@ -14,4 +14,8 @@ textarea {
   @apply w-full bg-gray-600 text-gray-100 shadow;
 }
 
+.gallery {
+  @apply flex;
+}
+
 @tailwind utilities;

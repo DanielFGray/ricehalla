@@ -1,5 +1,6 @@
 import React, { useReducer, useState, Reducer } from 'react'
 /* import loadable from '@loadable/component' */
+import { SimpleImg as Image } from 'react-simple-img'
 import marked from 'marked'
 
 import Stringify from '../Stringify'
@@ -169,23 +170,28 @@ export default function Item({
         {data.urls.map(url => (
           <li key={url}>
             <a href={url}>
-              <img src={url} />
+              <Image
+                src={url}
+                applyAspectRatio
+                config={{ logConsoleError: true }}
+              />
             </a>
           </li>
         ))}
       </ul>
       <div className="title">{data.title}</div>
-      {data.description &&
-        <div
-          className="description"
-          dangerouslySetInnerHTML={{ __html: marked(data.description) }}
-        />
-      }
-      {/*editable && (
+      {data.description
+        && (
+          <div
+            className="description"
+            dangerouslySetInnerHTML={{ __html: marked(data.description) }}
+          />
+        )}
+      {/* editable && (
         <button type="button" name="edit" className="edit" onClick={() => setExpanded(true)}>
           edit
         </button>
-      )*/}
+      ) */}
     </div>
   )
 }

@@ -1,6 +1,6 @@
 #import "./DesktopParts.gql"
 query DesktopList {
-  DesktopList {
+  Desktop {
     ...DesktopParts
   }
 }

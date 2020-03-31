@@ -5,7 +5,6 @@ import bodyParser from 'koa-bodyparser'
 import koaSession from 'koa-session'
 import { ApolloServer } from 'apollo-server-koa'
 import send from 'koa-send'
-import kcompose from 'koa-compose'
 import morgan from 'koa-morgan'
 import SSR from './SSR'
 
@@ -27,7 +26,7 @@ async function staticFiles(ctx: Koa.Context, next: Koa.Next) {
   return next()
 }
 
-export default function main({ app, schema }: { app: Koa, schema: GraphQLSchema }) {
+export default async function main({ app, schema }: { app: Koa, schema: GraphQLSchema }) {
   if (! SESSION_SECRET) throw new Error('missing env var SESSION_SECRET')
 
   const apolloServer = new ApolloServer({
