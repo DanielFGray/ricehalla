@@ -17,7 +17,7 @@ const codegen = {
   watching: null,
   start() {
     if (! this.watching) {
-      this.watching = runAll(['gqlgen -w'], {
+      this.watching = runAll(['gentypes -w'], {
         silent: true,
         stdout: process.stdout /* , printName: true */,
       })

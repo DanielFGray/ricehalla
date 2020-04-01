@@ -8,3 +8,4 @@ node_modules/
 secrets.js
 *.sqlite3
 localhost*.pem
+generated-types.ts

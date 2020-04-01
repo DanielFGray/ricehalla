@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { Helmet } from 'react-helmet-async'
 import { Switch, Route } from 'react-router-dom'
-import { hot } from 'react-hot-loader/root'
 import Desktops from './Desktops'
 import NotFound from './NotFound'
 
@@ -24,4 +23,4 @@ export function Layout() {
   )
 }
 
-export default hot(Layout)
+export default Layout

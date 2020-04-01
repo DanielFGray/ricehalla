@@ -6,7 +6,7 @@
   "scripts": {
     "postinstall": "typesync",
     "prestart": "graphql-codegen",
-    "start": "nodemon -w src -w webpack.config.js -w babel.config.js -x 'babel-node --inspect -x .ts,.js,.tsx,.jsx src/index.ts'",
+    "start": "nodemon -w src -w webpack.config.js -w babel.config.js -x 'clear; babel-node --inspect -x .ts,.js,.tsx,.jsx src/index.ts'",
     "prebuild": "graphql-codegen",
     "build": "NODE_ENV=production webpack -p",
     "lint:css": "stylelint './src/**/*.css' --fix",
