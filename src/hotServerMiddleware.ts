@@ -186,8 +186,6 @@ function webpackHotServerMiddleware(multiCompiler: webpack.MultiCompiler) {
   const [serverCompiler] = findCompiler(multiCompiler, 'server')
   const clientCompilers = findCompiler(multiCompiler, 'client')
 
-  console.log(serverCompiler && clientCompilers)
-
   const outputFs = serverCompiler.outputFileSystem as any
   const { outputPath } = serverCompiler
 

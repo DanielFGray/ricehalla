@@ -7,7 +7,7 @@ import { execute, subscribe } from 'graphql'
 import app from './app'
 import { schema } from './resolvers'
 
-const { NODE_ENV, PORT, HOST } = process.env
+const { APP_URL, NODE_ENV, PORT, HOST } = process.env
 
 function die(e?: Error | string) {
   if (e) console.error(e)
@@ -22,11 +22,9 @@ async function main() {
   const koa = new Koa()
 
   if (NODE_ENV === 'development') {
-    const { dev } = await import('./dev')
-    koa.use(await dev())
+    koa.use(await (await import('./dev' /* webpackChunkName: "dev-tools" */)).dev())
   } else {
-    const manifest = JSON.parse(await fs.readFile('./dist/manifest.json', 'utf8'))
-    console.log({ manifest })
+    const manifest = JSON.parse(await fs.readFile('./manifest.json', 'utf8'))
     koa.use(async (ctx, next) => {
       ctx.state.manifest = manifest
       await next()
@@ -40,7 +38,7 @@ async function main() {
 
   await new Promise(res => server.listen(Number(PORT), HOST, res))
 
-  console.info(`server now running on http://${HOST}:${PORT}`)
+  console.info(`server now running on ${APP_URL}`)
   SubscriptionServer.create(
     {
       execute,

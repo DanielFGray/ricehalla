@@ -13,7 +13,7 @@ type Query {
 
 type Mutation {
   DesktopCreate(title: String!, description: String, urls: [String!]!): Desktop
-  DesktopUpdate(id: Int!, title: String, description: String, urls: [String]): Desktop
+  DesktopUpdate(id: Int!, title: String, description: String, urls: [String!]): Desktop
   DesktopDelete(id: Int!): Int!
 }
 

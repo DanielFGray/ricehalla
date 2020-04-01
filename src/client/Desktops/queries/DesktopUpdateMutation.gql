@@ -1,6 +1,16 @@
 #import "./DesktopParts.gql"
-mutation DesktopUpdate ($id: Int!, $title: String, $description: String, $urls: [String!]) {
-  DesktopUpdate (id: $id, title: $title, description: $description, urls: $urls) {
+mutation DesktopUpdate (
+  $id: Int!
+  $title: String
+  $description: String
+  $urls: [String!]
+) {
+  DesktopUpdate (
+    id: $id
+    title: $title
+    description: $description
+    urls: $urls
+  ) {
     ...DesktopParts
   }
 }

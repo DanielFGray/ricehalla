@@ -10,6 +10,8 @@ import { HelmetProvider } from 'react-helmet-async'
 import { ApolloProvider } from '@apollo/react-hooks'
 import { ApolloClient } from 'apollo-client'
 import { SchemaLink } from 'apollo-link-schema'
+import { onError } from 'apollo-link-error'
+import { ApolloLink } from 'apollo-link'
 import { InMemoryCache } from 'apollo-cache-inmemory'
 import Layout from './client/Layout'
 import Html from './Html'
@@ -42,10 +44,19 @@ const getAssets = (ctx: Koa.Context) => {
 
 export default function SSR({ schema }: { schema: GraphQLSchema }) {
   return async (ctx: Koa.Context) => {
-    const link = new SchemaLink({ schema })
     const client = new ApolloClient({
       ssrMode: true,
-      link,
+      link: ApolloLink.from([
+        onError(({ networkError, graphQLErrors }) => {
+          if (graphQLErrors) {
+            console.error(...graphQLErrors)
+          }
+          if (networkError) {
+            console.error(networkError)
+          }
+        }),
+        new SchemaLink({ schema }),
+      ]),
       cache: new InMemoryCache(),
     })
     const { styles, scripts } = getAssets(ctx)

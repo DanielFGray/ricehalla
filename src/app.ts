@@ -53,8 +53,6 @@ export default async function main({ app, schema }: { app: Koa, schema: GraphQLS
     renew: true,
   }
 
-  console.log('making middleware')
-
   app.use(koaHelmet())
   app.use(bodyParser())
   app.use(morgan('dev'))

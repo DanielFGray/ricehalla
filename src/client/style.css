@@ -5,17 +5,24 @@
 /* purgecss end ignore */
 
 body {
-  @apply bg-gray-900 text-gray-100;
+  @apply bg-gray-900
+    text-gray-100;
 }
 
 button,
 input,
 textarea {
-  @apply w-full bg-gray-600 text-gray-100 shadow;
+  @apply w-full
+    bg-gray-600
+    text-gray-100
+    shadow;
 }
 
-.gallery {
-  @apply flex;
+.desktopView {
+  @apply flex
+    flex-row
+    m-2
+    bg-gray-800;
 }
 
 @tailwind utilities;
