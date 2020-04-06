@@ -6,7 +6,7 @@ import NotFound from './NotFound'
 
 const { APP_TITLE } = process.env
 
-export function Layout() {
+export default function Layout() {
   return (
     <div className="layout">
       <Helmet
@@ -22,5 +22,3 @@ export function Layout() {
     </div>
   )
 }
-
-export default Layout

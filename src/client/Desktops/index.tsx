@@ -39,7 +39,7 @@ export default function Desktop() {
       {errors && <div className="error">{Stringify(errors)}</div>}
       {listDesktops && (
         <div className="desktopList">
-          {listDesktops.map(x => x && <Item key={x.id} data={x} />)}
+          {listDesktops.map(x => <Item key={x.id} data={x} />)}
         </div>
       )}
     </div>

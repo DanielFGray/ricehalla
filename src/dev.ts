@@ -1,15 +1,15 @@
 /* eslint-disable import/no-extraneous-dependencies, global-require */
-import { spawn } from 'child_process'
+// import { spawn } from 'child_process'
 import fetch from 'isomorphic-unfetch'
+import runAll from 'npm-run-all'
 import webpack from 'webpack'
 import koaWebpack from 'koa-webpack'
-import runAll from 'npm-run-all'
 import compose from 'koa-compose'
-import formatWebpackMessages from 'react-dev-utils/formatWebpackMessages'
 import connect from 'koa-connect'
-import hotServer from './hotServerMiddleware'
-import config from '../webpack.config'
+import formatWebpackMessages from 'react-dev-utils/formatWebpackMessages'
 import errorOverlayMiddleware from 'react-dev-utils/errorOverlayMiddleware'
+// import hotServer from './hotServerMiddleware'
+import config from '../webpack.config'
 
 const { APP_URL } = process.env
 
@@ -31,8 +31,6 @@ export async function dev() {
   const clientCompiler = multiCompiler.compilers.find(c => c.name === 'client')
 
   multiCompiler.compilers.forEach(c => {
-    // c.hooks.invalid.tap(`compiling ${c.name}`, () => spawn('clear', { stdio: 'inherit' }))
-
     c.hooks.done.tap('built', stats => {
       codegen.start()
 
@@ -46,8 +44,7 @@ export async function dev() {
       } else if (messages.warnings.length) {
         console.log('Compiled with warnings.')
         messages.warnings.forEach(w => console.log(w))
-      }
-      else if (! messages.errors.length && ! messages.warnings.length) {
+      } else if (! messages.errors.length && ! messages.warnings.length) {
         console.log('Compiled successfully!')
       }
     })

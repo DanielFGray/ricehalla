@@ -1,6 +1,6 @@
 import React, { useReducer, useState, Reducer } from 'react'
 // import loadable from '@loadable/component'
-// import { SimpleImg as Image } from 'react-simple-img'
+import { SimpleImg as Image } from 'react-simple-img'
 import marked from 'marked'
 
 import Stringify from '../Stringify'
@@ -124,7 +124,7 @@ export default function Item({
   // desktopDelete: () => Promise<void>
   editable?: boolean
 }) {
-  // const [expanded, setExpanded] = useState(false)
+  // const [expanded, setExpanded] = useState(false) // {{{
 
   // const doneEdit = (update: FormState) => (e?: any) => {
   //   if (e) e.preventDefault()
@@ -163,11 +163,12 @@ export default function Item({
   //     />
   //   )
   // }
+  // }}}
 
   return (
     <div className="desktopView">
       <ul className="gallery">
-        {data.urls.map(url => (
+        {data.urls.slice(100).map(url => (
           <li key={url}>
             <a href={url}>
               <img

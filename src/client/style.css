@@ -25,4 +25,20 @@ textarea {
     bg-gray-800;
 }
 
+.desktopList .gallery {
+  @apply flex flex-row;
+}
+
+.desktopList img {
+  @apply h-20;
+}
+
+.desktopList .description {
+  @apply overflow-auto h-20;
+}
+
+.desktopList .desktopView {
+  @apply h-20;
+}
+
 @tailwind utilities;

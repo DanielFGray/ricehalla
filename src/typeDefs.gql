@@ -7,13 +7,23 @@ type Desktop {
   updated_at: String!
 }
 
+enum DesktopOrder {
+  CREATED_AT
+}
+
 type Query {
-  Desktop: [Desktop]
+  DesktopList(offset: Int!, limit: Int!, order: DesktopOrder!): [Desktop]!
+  Desktop(id: Int!): Desktop
 }
 
 type Mutation {
   DesktopCreate(title: String!, description: String, urls: [String!]!): Desktop
-  DesktopUpdate(id: Int!, title: String, description: String, urls: [String!]): Desktop
+  DesktopUpdate(
+    id: Int!
+    title: String
+    description: String
+    urls: [String!]
+  ): Desktop
   DesktopDelete(id: Int!): Int!
 }
 

@@ -1,6 +1,11 @@
-import { useEffect, useMemo } from 'react'
+import { useMemo } from 'react'
 import { ApolloError } from 'apollo-client'
 import {
+  DesktopListDocument,
+  DesktopCreateMutationVariables,
+  // DesktopUpdateMutationVariables,
+  Desktop,
+  DesktopOrder,
   useDesktopListQuery,
   useDesktopCreateMutation,
   // useDesktopUpdateMutation,
@@ -8,17 +13,19 @@ import {
   useDesktopCreatedSubscription,
   // useDesktopUpdatedSubscription,
   // useDesktopDeletedSubscription,
-  DesktopListDocument,
-  DesktopCreateMutationVariables,
-  // DesktopUpdateMutationVariables,
-  Desktop,
 } from '../../generated-types'
 
 export default function useDesktops() {
-  const { data, refetch, error: errorQuery } = useDesktopListQuery()
+  const { data, refetch, error: errorQuery } = useDesktopListQuery({
+    variables: {
+      order: DesktopOrder.CreatedAt,
+      offset: 0,
+      limit: 100,
+    },
+  })
   const [_createDesktop, { error: errorCreate }] = useDesktopCreateMutation()
   // const [_updateDesktop, { error: errorUpdate }] = useDesktopUpdateMutation()
-  // const [_deleteDesktop, { error: errorDel }] = useDesktopDeleteMutation()
+  // const [_deleteDesktop, { error: errorDelete }] = useDesktopDeleteMutation()
 
   function createDesktop({ description, title, urls }: DesktopCreateMutationVariables) {
     return _createDesktop({
@@ -27,6 +34,7 @@ export default function useDesktops() {
         __typename: 'Mutation',
         DesktopCreate: {
           __typename: 'Desktop',
+          id: null,
           description,
           title,
           urls,
@@ -34,10 +42,9 @@ export default function useDesktops() {
       },
       update: (proxy, result) => {
         const created = result.data?.DesktopCreate
-        const cache = proxy.readQuery<{Desktop: Desktop[]}>({ query: DesktopListDocument })
+        const cache = proxy.readQuery<{ DesktopList: Desktop[] }>({ query: DesktopListDocument })
         if (! (created && cache)) return
-        const exists = cache.Desktop.findIndex(e => e.id === created.id)
-        const DesktopList = [created, ...cache?.Desktop ?? []]
+        const DesktopList = [created, ...(cache?.DesktopList ?? [])]
         proxy.writeQuery({
           query: DesktopListDocument,
           data: { DesktopList },
@@ -61,7 +68,7 @@ export default function useDesktops() {
   //     },
   //     update: (proxy, result) => {
   //       const cache = proxy.readQuery({ query: DesktopListDocument })
-  //       const idx = cache.Desktop.findIndex(e => e.id === id)
+  //       const idx = cache.DesktopList.findIndex(e => e.id === id)
   //       if (idx < 0) return
   //       const DesktopList = [
   //         ...cache.Desktop.slice(0, idx),
@@ -81,12 +88,9 @@ export default function useDesktops() {
   //     variables: { id },
   //     update: proxy => {
   //       const cache = proxy.readQuery({ query: DesktopListDocument })
-  //       const idx = cache.Desktop.findIndex(e => e.id === id)
+  //       const idx = cache.DesktopList.findIndex(e => e.id === id)
   //       if (idx < 0) return
-  //       const DesktopList = [
-  //         ...cache.Desktop.slice(0, idx),
-  //         ...cache.Desktop.slice(idx + 1),
-  //       ]
+  //       const DesktopList = cache.Desktop.slice(0, idx).concat(cache.Desktop.slice(idx + 1))
   //       proxy.writeQuery({
   //         query: DesktopListDocument,
   //         data: { DesktopList },
@@ -99,10 +103,10 @@ export default function useDesktops() {
     onSubscriptionData: ({ client, subscriptionData }) => {
       const created = subscriptionData.data?.DesktopCreated
       if (! created) return
-      const cache = client.readQuery({ query: DesktopListDocument })
-      const idx = cache.Desktop.findIndex(e => e.id === created)
+      const cache = client.readQuery<{ DesktopList: Desktop[] }>({ query: DesktopListDocument })
+      const idx = cache.DesktopList.findIndex(e => e.id === created)
       if (idx < 0) return
-      const DesktopList = [...cache.Desktop.slice(0, idx), ...cache.Desktop.slice(idx + 1)]
+      const DesktopList = [...cache.DesktopList.slice(0, idx), ...cache.DesktopList.slice(idx + 1)]
       client.writeQuery({
         query: DesktopListDocument,
         data: { DesktopList },
@@ -115,12 +119,12 @@ export default function useDesktops() {
   //     const updated = subscriptionData.data?.DesktopUpdated
   //     const cache = client.readQuery({ query: DesktopListDocument })
   //     if (! (cache && updated)) return
-  //     const idx = cache.Desktop.findIndex(e => e.id === updated.id)
+  //     const idx = cache.DesktopList.findIndex(e => e.id === updated.id)
   //     if (idx < 0) return
   //     const DesktopList = [
-  //       ...cache.Desktop.slice(0, idx),
+  //       ...cache.DesktopList.slice(0, idx),
   //       subscriptionData.data.DesktopUpdated,
-  //       ...cache.Desktop.slice(idx + 1),
+  //       ...cache.DesktopList.slice(idx + 1),
   //     ]
   //     client.writeQuery({
   //       query: DesktopListDocument,
@@ -134,9 +138,9 @@ export default function useDesktops() {
   //     const deleted = subscriptionData.data?.DesktopDeleted
   //     const cache = client.readQuery({ query: DesktopListDocument })
   //     if (! (deleted && cache)) return
-  //     const idx = cache.Desktop.findIndex(e => e.id === deleted)
+  //     const idx = cache.DesktopList.findIndex(e => e.id === deleted)
   //     if (idx < 0) return
-  //     const DesktopList = [...cache.Desktop.slice(0, idx), ...cache.Desktop.slice(idx + 1)]
+  //     const DesktopList = [...cache.DesktopList.slice(0, idx), ...cache.DesktopList.slice(idx + 1)]
   //     client.writeQuery({
   //       query: DesktopListDocument,
   //       data: { DesktopList },
@@ -144,21 +148,24 @@ export default function useDesktops() {
   //   },
   // })
 
-  const errors = useMemo(() => [
-    errorQuery,
-    errorCreate,
-    // errorUpdate,
-    // errorDel,
-    errorCreate$,
-    // errorDelete$,
-    // errorUpdate$,
-  ].reduce((p: undefined | ApolloError[], c: undefined | ApolloError) => {
-    if (! c) return p
-    if (p) return (p.push(c), p)
-    return [c]
-  }, undefined), [errorCreate, errorQuery, errorCreate$])
+  const errors = useMemo(
+    () => [
+      errorQuery,
+      errorCreate,
+      // errorUpdate,
+      // errorDelete,
+      errorCreate$,
+      // errorDelete$,
+      // errorUpdate$,
+    ].reduce((p: undefined | ApolloError[], c: undefined | ApolloError) => {
+      if (! c) return p
+      if (p) return p.push(c), p
+      return [c]
+    }, undefined),
+    [errorCreate, errorQuery, errorCreate$],
+  )
 
-  const listDesktops = data?.Desktop.slice(0).sort((a, b) => b.updated_at - a.updated_at)
+  const listDesktops = data.DesktopList.slice(0).sort((a, b) => b.updated_at - a.updated_at)
 
   return {
     listDesktops,

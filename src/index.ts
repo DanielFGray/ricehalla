@@ -18,13 +18,16 @@ process.on('exit', () => die('exiting!'))
 process.on('SIGINT', () => die('interrupted!'))
 process.on('uncaughtException', die)
 
-async function main() {
+type Manifest = Record<string, string>
+
+export default async function main() {
   const koa = new Koa()
 
   if (NODE_ENV === 'development') {
     koa.use(await (await import('./dev' /* webpackChunkName: "dev-tools" */)).dev())
   } else {
-    const manifest = JSON.parse(await fs.readFile('./manifest.json', 'utf8'))
+    const manifestFile = (await import('path')).resolve('./dist/manifest.json')
+    const manifest = JSON.parse(await fs.readFile(manifestFile, 'utf8'))
     koa.use(async (ctx, next) => {
       ctx.state.manifest = manifest
       await next()
@@ -35,6 +38,8 @@ async function main() {
 
   const server = http.createServer()
   server.on('request', koa.callback()) // eslint-disable-line @typescript-eslint/no-misused-promises
+
+  process.on('SIGUSR2', () => console.log('whoa'))
 
   await new Promise(res => server.listen(Number(PORT), HOST, res))
 
@@ -53,3 +58,7 @@ async function main() {
 }
 
 main().catch(die)
+
+// if (! module.parent) {
+//   main().catch(die)
+// }

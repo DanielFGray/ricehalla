@@ -8,10 +8,10 @@ import { ApolloLink } from 'apollo-link'
 import { HttpLink } from 'apollo-link-http'
 import { InMemoryCache } from 'apollo-cache-inmemory'
 import { WebSocketLink } from 'apollo-link-ws'
+import { onError } from 'apollo-link-error'
 // import { loadableReady } from '@loadable/component'
 import Layout from './Layout'
 
-/* import 'normalize.css' */
 import './style.css'
 
 const { APP_URL, APP_BASE, MOUNT } = process.env
@@ -30,6 +30,14 @@ export default function main() {
   const apolloClient = new ApolloClient({
     cache,
     link: ApolloLink.from([
+      onError(({ networkError, graphQLErrors }) => {
+        if (graphQLErrors) {
+          console.error(...graphQLErrors)
+        }
+        if (networkError) {
+          console.error(networkError)
+        }
+      }),
       // new WebSocketLink({
       //   uri: `ws://${APP_URL}/subscriptions`,
       //   options: {
@@ -61,6 +69,4 @@ export default function main() {
   // })
 }
 
-if (document) {
-  document.addEventListener('DOMContentLoaded', main)
-}
+main()

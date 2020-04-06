@@ -1,4 +1,3 @@
-import type Koa from 'koa'
 import type { GraphQLSchema } from 'graphql'
 import type { StaticRouterContext } from 'react-router'
 // import path from 'path'
@@ -15,10 +14,11 @@ import { ApolloLink } from 'apollo-link'
 import { InMemoryCache } from 'apollo-cache-inmemory'
 import Layout from './client/Layout'
 import Html from './Html'
+import { KoaContext } from './types'
 
 const { NODE_ENV, APP_BASE } = process.env
 
-const getAssets = (ctx: Koa.Context) => {
+function getAssets(ctx: KoaContext) {
   const list: string[] = Object.values(
     NODE_ENV === 'production'
       ? ctx.state.manifest
@@ -43,7 +43,7 @@ const getAssets = (ctx: Koa.Context) => {
 // )
 
 export default function SSR({ schema }: { schema: GraphQLSchema }) {
-  return async (ctx: Koa.Context) => {
+  return async (ctx: KoaContext) => {
     const client = new ApolloClient({
       ssrMode: true,
       link: ApolloLink.from([

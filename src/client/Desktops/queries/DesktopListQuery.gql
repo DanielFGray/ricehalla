@@ -1,7 +1,6 @@
 #import "./DesktopParts.gql"
-query DesktopList {
-  Desktop {
+query DesktopList($offset: Int!, $limit: Int!, $order: DesktopOrder!) {
+  DesktopList(offset: $offset, limit: $limit, order: $order) {
     ...DesktopParts
   }
 }
-

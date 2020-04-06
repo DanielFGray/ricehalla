@@ -14,12 +14,15 @@ const TerserPlugin = require('terser-webpack-plugin')
 const WatchMissingNodeModulesPlugin = require('react-dev-utils/WatchMissingNodeModulesPlugin')
 const ModuleNotFoundPlugin = require('react-dev-utils/ModuleNotFoundPlugin')
 const WebpackBar = require('webpackbar')
+const StartServerPlugin = require('start-server-webpack-plugin')
 // const WorkboxWebpackPlugin = require('workbox-webpack-plugin')
-// const LoadablePlugin = require('@loadable/webpack-plugin')
+const LoadablePlugin = require('@loadable/webpack-plugin')
 
 const { NODE_ENV, PUBLIC_DIR, OUTPUT_DIR, APP_TITLE, APP_BASE, MOUNT, HOST, PORT } = process.env
 
-if (NODE_ENV !== 'production' && NODE_ENV !== 'development') throw new Error('NODE_ENV must be set to "development" or "production"')
+if (NODE_ENV !== 'production' && NODE_ENV !== 'development') {
+  throw new Error('NODE_ENV must be set to "development" or "production"')
+}
 
 const devMode = NODE_ENV === 'development'
 
@@ -58,17 +61,6 @@ const stats = {
 
 const extensions = ['.ts', '.tsx', '.js', '.jsx', '.cjs']
 
-const definePlugin = () => new webpack.DefinePlugin({
-  'process.env': {
-    NODE_ENV: JSON.stringify(NODE_ENV),
-    APP_BASE: JSON.stringify(APP_BASE),
-    APP_TITLE: JSON.stringify(APP_TITLE),
-    MOUNT: JSON.stringify(MOUNT),
-    HOST: JSON.stringify(HOST),
-    PORT: JSON.stringify(PORT),
-  },
-})
-
 /** @type {webpack.Configuration} */
 const clientConfig = {
   name: 'client',
@@ -102,12 +94,19 @@ const clientConfig = {
     },
   },
   plugins: [
-    // new LoadablePlugin({ writeToDisk: false }),
+    new LoadablePlugin({ writeToDisk: false }),
     new MiniCssExtractPlugin({
       filename: devMode ? '[name].css' : '[name]-[hash:8].css',
       chunkFilename: devMode ? '[name].css' : '[name]-[chunkhash:8].css',
     }),
-    definePlugin(),
+    new webpack.DefinePlugin({
+      'process.env': {
+        NODE_ENV: JSON.stringify(NODE_ENV),
+        APP_BASE: JSON.stringify(APP_BASE),
+        APP_TITLE: JSON.stringify(APP_TITLE),
+        MOUNT: JSON.stringify(MOUNT),
+      },
+    }),
     new WebpackAssetsManifest({
       // https://github.com/webdeveric/webpack-assets-manifest/#readme
       output: path.join(path.resolve(OUTPUT_DIR), './manifest.json'),
@@ -133,10 +132,15 @@ const clientConfig = {
 const serverConfig = {
   name: 'server',
   mode: NODE_ENV,
-  entry: [devMode ? './src/app' : './src/index'],
+  // entry: devMode ? './src/app' : './src/index',
+  entry: { server: './src/index' },
   devtool: devMode ? 'eval-source-map' : 'source-map',
   target: 'async-node',
-  externals: [nodeExternals()],
+  externals: [
+    nodeExternals({
+      whitelist: ['.env'],
+    }),
+  ],
   resolve: {
     extensions,
   },
@@ -144,19 +148,27 @@ const serverConfig = {
     new webpack.optimize.LimitChunkCountPlugin({
       maxChunks: 1,
     }),
-    new webpack.BannerPlugin({
-      banner: 'require("source-map-support").install();',
-      entryOnly: false,
-      include: ['main.js'],
-      raw: true,
-    }),
-    definePlugin(),
-    // new LoadablePlugin({ filename: 'loadable-node-stats.json', writeToDisk: true })
+    new LoadablePlugin({ filename: 'loadable-node-stats.json', writeToDisk: true }),
+    ...(devMode
+      ? [
+        new webpack.BannerPlugin({
+          banner: 'require("source-map-support").install();',
+          entryOnly: false,
+          include: ['server.js'],
+          raw: true,
+        }),
+        new StartServerPlugin({
+          name: 'server.js',
+          nodeArgs: ['--inspect'], // allow debugging
+          signal: true, // signal to send for HMR (defaults to `false`, uses 'SIGUSR2' if `true`)
+          keyboard: true, // Allow typing 'rs' to restart the server. default: only if NODE_ENV is 'development'
+        }),
+      ]
+      : []),
   ],
   output: {
     filename: '[name].js',
     libraryTarget: 'commonjs2',
-    chunkFilename: '[name]-[hash].js',
     path: path.resolve(OUTPUT_DIR),
   },
   module: {
@@ -170,7 +182,12 @@ const configs = [clientConfig, serverConfig]
 if (devMode) {
   configs.forEach(c => {
     c.plugins.push(new WebpackBar({ profile: true }))
+    if (c.name === 'server') {
+      c.plugins.push(
+      )
+    }
   })
 }
 
+/** @type {webpack.Configuration[]} */
 module.exports = configs
