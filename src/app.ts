@@ -36,29 +36,28 @@ export default async function main({ app, schema }: { app: Koa; schema: GraphQLS
 
   await sessionPoolMiddleware(app)
 
-  app.use(
-    new ApolloServer({
-      schema,
-      playground: {
-        settings: {
-          'editor.theme': 'light',
-        },
+  const apollo = new ApolloServer({
+    schema,
+    playground: {
+      settings: {
+        'editor.theme': 'light',
       },
-      context(context) {
-        console.log({ context })
-        throw new Error('FIZZBUZZ')
-        const { connection } = context.ctx.state
-        const { session } = context.ctx
-        return { connection, session }
+    },
+    context(context) {
+      console.log({ context })
+      throw new Error('FIZZBUZZ')
+      const { connection } = context.ctx.state
+      const { session } = context.ctx
+      return { connection, session }
+    },
+    subscriptions: {
+      path: '/subscriptions',
+      onConnect: (connection, websocket, context) => {
+        console.log({ connection, websocket, context })
       },
-      // subscriptions: {
-      //   path: '/subscriptions',
-      //   onConnect: (connection, websocket, context) => {
-      //     console.log({ connection, websocket, context })
-      //   },
-      // },
-    }).getMiddleware(),
-  )
+    },
+  })
+  app.use(apollo.getMiddleware())
 
   app.use(SSR({ schema }))
 }
