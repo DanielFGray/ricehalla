@@ -3,6 +3,10 @@ fragment DesktopParts on Desktop {
   title
   description
   urls
-  created_at
-  updated_at
+  createdAt
+  updatedAt
+  user {
+    username
+    id
+  }
 }

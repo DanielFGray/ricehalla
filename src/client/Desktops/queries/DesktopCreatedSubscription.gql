@@ -1,6 +1,0 @@
-#import "./DesktopParts.gql"
-subscription DesktopCreated {
-  DesktopCreated {
-    ...DesktopParts
-  }
-}

@@ -18,7 +18,6 @@ export default function Desktop() {
       <Helmet>
         <title>Home</title>
       </Helmet>
-      <h3>Home</h3>
       <Form
         submit={createDesktop}
         preview
@@ -39,7 +38,16 @@ export default function Desktop() {
       {errors && <div className="error">{Stringify(errors)}</div>}
       {listDesktops && (
         <div className="desktopList">
-          {listDesktops.map(x => <Item key={x.id} data={x} />)}
+          {listDesktops.map(
+            x => x && (
+              <Item
+                key={x.id}
+                data={x}
+                // deleteDesktop={() => deleteDesktop({ id: x.id })}
+                // updateDesktop={updateDesktop}
+              />
+            ),
+          )}
         </div>
       )}
     </div>

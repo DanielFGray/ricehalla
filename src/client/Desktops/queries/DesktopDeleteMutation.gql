@@ -1,3 +1,5 @@
-mutation DesktopDelete ($id: Int!) {
-  DesktopDelete(id: $id)
+mutation deleteDesktop ($id: UUID!) {
+  deleteDesktop(input: { id: $id }) {
+    deletedDesktopNodeId
+  }
 }

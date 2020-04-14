@@ -1,10 +1,16 @@
 #import "./DesktopParts.gql"
-mutation DesktopCreate(
+mutation createDesktop(
   $title: String!
   $description: String
-  $urls: [String!]!
+  $urls: [Url!]!
 ) {
-  DesktopCreate(description: $description, title: $title, urls: $urls) {
-    ...DesktopParts
+  createDesktop(
+    input: {
+      desktop: { description: $description, title: $title, urls: $urls }
+    }
+  ) {
+    desktop {
+      ...DesktopParts
+    }
   }
 }

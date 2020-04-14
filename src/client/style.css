@@ -12,33 +12,38 @@ body {
 button,
 input,
 textarea {
-  @apply w-full
-    bg-gray-600
-    text-gray-100
-    shadow;
+  @apply w-full bg-gray-600 text-gray-100 shadow rounded p-1;
 }
 
-.desktopView {
-  @apply flex
-    flex-row
-    m-2
-    bg-gray-800;
+nav {
+  @apply w-full;
+
+  & ul {
+    @apply m-2 flex flex-row items-center justify-between;
+  }
 }
 
-.desktopList .gallery {
-  @apply flex flex-row;
+.desktopList {
+  & .gallery {
+    @apply flex flex-row;
+  }
+
+  & img {
+    @apply h-20;
+  }
+
+  & .description {
+    @apply overflow-auto h-20;
+  }
+
+  & .desktopView {
+    @apply flex flex-row m-2 bg-gray-800;
+  }
 }
 
-.desktopList img {
-  @apply h-20;
-}
-
-.desktopList .description {
-  @apply overflow-auto h-20;
-}
-
-.desktopList .desktopView {
-  @apply h-20;
+.signup,
+.signin {
+  @apply flex items-center justify-center py-12 px-4;
 }
 
 @tailwind utilities;

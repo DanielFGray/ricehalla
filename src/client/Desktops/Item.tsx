@@ -1,9 +1,10 @@
 import React, { useReducer, useState, Reducer } from 'react'
 // import loadable from '@loadable/component'
-import { SimpleImg as Image } from 'react-simple-img'
+import { SimpleImg as Img } from 'react-simple-img'
 import marked from 'marked'
 
 import Stringify from '../Stringify'
+import { Desktop, DesktopPartsFragment } from '../../generated-types'
 
 /* const Marked = loadable.lib(() => import('marked'))
  <Marked fallback={<div className="description">{data.description}</div>}>
@@ -15,11 +16,7 @@ import Stringify from '../Stringify'
   )}
 </Marked> */
 
-interface FormState {
-  title: string
-  description: string
-  urls: string[]
-}
+type FormState = Pick<Desktop, 'title' | 'description' | 'urls'>
 
 const formReducer: Reducer<
   FormState,
@@ -30,7 +27,7 @@ const formReducer: Reducer<
     }
   | {
       type: 'fieldChange'
-      field: keyof FormState
+      field: 'title' | 'description'
       payload: string
     }
 > = (state, action) => {
@@ -78,7 +75,9 @@ export function Form({
           placeholder="title"
           value={state.title}
           onChange={e => dispatch({ type: 'fieldChange', field: 'title', payload: e.currentTarget.value })}
-          onKeyDown={e => { if (cancelled && e.keyCode === 27) cancelled() }}
+          onKeyDown={e => {
+            if (cancelled && e.keyCode === 27) cancelled()
+          }}
         />
       </div>
       <div className="urls">
@@ -86,22 +85,31 @@ export function Form({
           type="text"
           placeholder="urls"
           value={state.urls.join(' ')}
-          onChange={e => dispatch({ type: 'fieldChange', field: 'urls', payload: e.currentTarget.value.split(/\s+/) })}
-          onKeyDown={e => { if (cancelled && e.keyCode === 27) cancelled() }}
+          onChange={e => dispatch({
+            type: 'fieldChange',
+            field: 'urls',
+            payload: e.currentTarget.value.split(/\s+/),
+          })}
+          onKeyDown={e => {
+            if (cancelled && e.keyCode === 27) cancelled()
+          }}
         />
-        {badUrls.length > 0 && badUrls.map(e => (
-          <div key={e}>
-            bad url:
-            {e}
-          </div>
-        ))}
+        {badUrls.length > 0
+          && badUrls.map(e => (
+            <div key={e}>
+              bad url:
+              {e}
+            </div>
+          ))}
       </div>
       <textarea
         className="description"
         placeholder="description"
-        value={state.description}
+        value={state.description ?? ''}
         onChange={e => dispatch({ type: 'fieldChange', field: 'description', payload: e.currentTarget.value })}
-        onKeyDown={e => { if (cancelled && e.keyCode === 27) cancelled() }}
+        onKeyDown={e => {
+          if (cancelled && e.keyCode === 27) cancelled()
+        }}
       />
       {actions(state)}
       {preview && (
@@ -115,55 +123,58 @@ export function Form({
 
 export default function Item({
   data,
-  // desktopUpdate,
-  // desktopDelete,
-  // editable = false,
+  desktopUpdate,
+  desktopDelete,
+  editable = false,
 }: {
-  data: FormState
-  // desktopUpdate: (d: FormState) => Promise<void>
-  // desktopDelete: () => Promise<void>
+  data: DesktopPartsFragment
+  desktopUpdate?: (d: DesktopPartsFragment) => Promise<void>
+  desktopDelete?: ({ id }: { id: number }) => Promise<void>
   editable?: boolean
 }) {
-  // const [expanded, setExpanded] = useState(false) // {{{
+  const [expanded, setExpanded] = useState(false)
 
-  // const doneEdit = (update: FormState) => (e?: any) => {
-  //   if (e) e.preventDefault()
-  //   desktopUpdate({ update })
-  //   setExpanded(false)
-  // }
+  const doneEdit = (update: DesktopPartsFragment) => (e?: any) => {
+    if (e) e.preventDefault()
+    if (desktopUpdate) {
+      desktopUpdate(update)
+    }
+    setExpanded(false)
+  }
 
-  // const cancelEdit = (e?: any) => {
-  //   if (e) e.preventDefault()
-  //   setExpanded(false)
-  // }
+  const cancelEdit = (e?: any) => {
+    if (e) e.preventDefault()
+    setExpanded(false)
+  }
 
-  // const handleDelete = () => {
-  //   desktopDelete()
-  // }
+  const handleDelete = () => {
+    if (desktopDelete){
+      desktopDelete({ id: data.id })
+    }
+  }
 
-  // if (expanded) {
-  //   return (
-  //     <Form
-  //       submit={doneEdit}
-  //       cancelled={cancelEdit}
-  //       data={data}
-  //       actions={state => (
-  //         <>
-  //           <button type="submit" onClick={doneEdit(state)}>
-  //             Update
-  //           </button>
-  //           <button type="button" onClick={handleDelete}>
-  //             Delete
-  //           </button>
-  //           <button type="button" onClick={cancelEdit}>
-  //             Cancel
-  //           </button>
-  //         </>
-  //       )}
-  //     />
-  //   )
-  // }
-  // }}}
+  if (expanded) {
+    return (
+      <Form
+        submit={doneEdit}
+        cancelled={cancelEdit}
+        data={data}
+        actions={state => (
+          <>
+            <button type="submit" onClick={doneEdit(state)}>
+              Update
+            </button>
+            <button type="button" onClick={handleDelete}>
+              Delete
+            </button>
+            <button type="button" onClick={cancelEdit}>
+              Cancel
+            </button>
+          </>
+        )}
+      />
+    )
+  }
 
   return (
     <div className="desktopView">
@@ -171,27 +182,23 @@ export default function Item({
         {data.urls.slice(100).map(url => (
           <li key={url}>
             <a href={url}>
-              <img
-                src={url}
-                config={{ logConsoleError: true }}
-              />
+              <Img src={url} config={{ logConsoleError: true }} />
             </a>
           </li>
         ))}
       </ul>
       <div className="title">{data.title}</div>
-      {data.description
-        && (
-          <div
-            className="description"
-            dangerouslySetInnerHTML={{ __html: marked(data.description) }}
-          />
-        )}
-      {/* editable && (
+      {data.description && (
+        <div
+          className="description"
+          dangerouslySetInnerHTML={{ __html: marked(data.description) }}
+        />
+      )}
+      {editable && (
         <button type="button" name="edit" className="edit" onClick={() => setExpanded(true)}>
           edit
         </button>
-      ) */}
+      )}
     </div>
   )
 }

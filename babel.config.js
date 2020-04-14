@@ -22,15 +22,5 @@ module.exports = {
   ],
   plugins: [
     ['import-graphql', { extensions: ['.gql'] }],
-    '@babel/plugin-syntax-dynamic-import',
-    '@loadable/babel-plugin',
-  ],
-  env: {
-    development: {
-      plugins: [],
-    },
-    production: {
-      plugins: [],
-    },
-  },
+  ]
 }

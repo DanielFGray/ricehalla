@@ -6,19 +6,16 @@
 require('dotenv').config()
 const path = require('path')
 const webpack = require('webpack')
-const WebpackAssetsManifest = require('webpack-assets-manifest')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin')
-const nodeExternals = require('webpack-node-externals')
 const TerserPlugin = require('terser-webpack-plugin')
 const WatchMissingNodeModulesPlugin = require('react-dev-utils/WatchMissingNodeModulesPlugin')
 const ModuleNotFoundPlugin = require('react-dev-utils/ModuleNotFoundPlugin')
 const WebpackBar = require('webpackbar')
-const StartServerPlugin = require('start-server-webpack-plugin')
-// const WorkboxWebpackPlugin = require('workbox-webpack-plugin')
-const LoadablePlugin = require('@loadable/webpack-plugin')
+const { WebpackPluginServe: Serve } = require('webpack-plugin-serve')
 
-const { NODE_ENV, PUBLIC_DIR, OUTPUT_DIR, APP_TITLE, APP_BASE, MOUNT, HOST, PORT } = process.env
+const { NODE_ENV, PUBLIC_DIR, APP_TITLE, APP_BASE, MOUNT } = process.env
 
 if (NODE_ENV !== 'production' && NODE_ENV !== 'development') {
   throw new Error('NODE_ENV must be set to "development" or "production"')
@@ -59,15 +56,18 @@ const stats = {
   colors: true,
 }
 
-const extensions = ['.ts', '.tsx', '.js', '.jsx', '.cjs']
+const extensions = ['.ts', '.tsx', '.js', '.jsx']
 
 /** @type {webpack.Configuration} */
-const clientConfig = {
+module.exports = {
   name: 'client',
   mode: NODE_ENV,
-  entry: ['./src/client/index'],
+  entry: './src/client/index',
   resolve: {
     extensions,
+  },
+  devServer: {
+    '/graphql': 'http://localhost:8080',
   },
   output: {
     path: path.resolve(PUBLIC_DIR),
@@ -94,7 +94,6 @@ const clientConfig = {
     },
   },
   plugins: [
-    new LoadablePlugin({ writeToDisk: false }),
     new MiniCssExtractPlugin({
       filename: devMode ? '[name].css' : '[name]-[hash:8].css',
       chunkFilename: devMode ? '[name].css' : '[name]-[chunkhash:8].css',
@@ -107,17 +106,38 @@ const clientConfig = {
         MOUNT: JSON.stringify(MOUNT),
       },
     }),
-    new WebpackAssetsManifest({
-      // https://github.com/webdeveric/webpack-assets-manifest/#readme
-      output: path.join(path.resolve(OUTPUT_DIR), './manifest.json'),
-      writeToDisk: true,
+    new HtmlWebpackPlugin({
+      template: 'src/client/html.ejs',
+      inject: false,
+      title: APP_TITLE,
+      appMountId: MOUNT,
+      mobile: true,
     }),
     ...(devMode
       ? [
+        new WebpackBar({ profile: true }),
         new WatchMissingNodeModulesPlugin(path.resolve('node_modules')),
         new ModuleNotFoundPlugin(path.resolve('src')),
-      ]
-      : [
+        new Serve({
+          progress: 'minimal',
+          port: 3000,
+          static: './public',
+          historyFallback: true,
+          waitForBuild: true,
+          middleware: (app, builtins) => {
+            app.use(
+              builtins.proxy('/graphiql', {
+                target: 'http://localhost:8080',
+              }),
+            )
+            app.use(
+              builtins.proxy('/graphql', {
+                target: 'http://localhost:8080',
+              }),
+            )
+          },
+        }),
+      ] : [
         new OptimizeCssAssetsPlugin({
           cssProcessorPluginOptions: {
             preset: ['default', { discardComments: { removeAll: true } }],
@@ -127,67 +147,3 @@ const clientConfig = {
   ],
   stats,
 }
-
-/** @type {webpack.Configuration} */
-const serverConfig = {
-  name: 'server',
-  mode: NODE_ENV,
-  // entry: devMode ? './src/app' : './src/index',
-  entry: { server: './src/index' },
-  devtool: devMode ? 'eval-source-map' : 'source-map',
-  target: 'async-node',
-  externals: [
-    nodeExternals({
-      whitelist: ['.env'],
-    }),
-  ],
-  resolve: {
-    extensions,
-  },
-  plugins: [
-    new webpack.optimize.LimitChunkCountPlugin({
-      maxChunks: 1,
-    }),
-    new LoadablePlugin({ filename: 'loadable-node-stats.json', writeToDisk: true }),
-    ...(devMode
-      ? [
-        new webpack.BannerPlugin({
-          banner: 'require("source-map-support").install();',
-          entryOnly: false,
-          include: ['server.js'],
-          raw: true,
-        }),
-        new StartServerPlugin({
-          name: 'server.js',
-          nodeArgs: ['--inspect'], // allow debugging
-          signal: true, // signal to send for HMR (defaults to `false`, uses 'SIGUSR2' if `true`)
-          keyboard: true, // Allow typing 'rs' to restart the server. default: only if NODE_ENV is 'development'
-        }),
-      ]
-      : []),
-  ],
-  output: {
-    filename: '[name].js',
-    libraryTarget: 'commonjs2',
-    path: path.resolve(OUTPUT_DIR),
-  },
-  module: {
-    rules: [babelLoader],
-  },
-  stats,
-}
-
-const configs = [clientConfig, serverConfig]
-
-if (devMode) {
-  configs.forEach(c => {
-    c.plugins.push(new WebpackBar({ profile: true }))
-    if (c.name === 'server') {
-      c.plugins.push(
-      )
-    }
-  })
-}
-
-/** @type {webpack.Configuration[]} */
-module.exports = configs

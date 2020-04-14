@@ -4,69 +4,43 @@ import { BrowserRouter as Router } from 'react-router-dom'
 import { HelmetProvider } from 'react-helmet-async'
 import { ApolloProvider } from '@apollo/react-hooks'
 import { ApolloClient } from 'apollo-client'
+import { InMemoryCache } from 'apollo-cache-inmemory'
 import { ApolloLink } from 'apollo-link'
 import { HttpLink } from 'apollo-link-http'
-import { InMemoryCache } from 'apollo-cache-inmemory'
-import { WebSocketLink } from 'apollo-link-ws'
 import { onError } from 'apollo-link-error'
-// import { loadableReady } from '@loadable/component'
+import './style.css'
 import Layout from './Layout'
 
-import './style.css'
+const { MOUNT } = process.env
 
-const { APP_URL, APP_BASE, MOUNT } = process.env
+const apolloClient = new ApolloClient({
+  cache: new InMemoryCache(),
+  link: ApolloLink.from([
+    onError(({ networkError, graphQLErrors }) => {
+      if (graphQLErrors) {
+        console.error(...graphQLErrors)
+      }
+      if (networkError) {
+        console.error(networkError)
+      }
+    }),
+    new HttpLink({
+      credentials: 'same-origin',
+      uri: '/graphql',
+    }),
+  ]),
+})
 
-export default function main() {
-  console.log('firing main')
-
-  const cache = new InMemoryCache()
-  try {
-    const initData = window.__INIT_DATA // eslint-disable-line no-underscore-dangle
-    if (initData) {
-      cache.restore(initData)
-    }
-  } catch (e) { console.error('unable to load cache', e) }
-
-  const apolloClient = new ApolloClient({
-    cache,
-    link: ApolloLink.from([
-      onError(({ networkError, graphQLErrors }) => {
-        if (graphQLErrors) {
-          console.error(...graphQLErrors)
-        }
-        if (networkError) {
-          console.error(networkError)
-        }
-      }),
-      // new WebSocketLink({
-      //   uri: `ws://${APP_URL}/subscriptions`,
-      //   options: {
-      //     reconnect: true,
-      //   },
-      // }),
-      new HttpLink({
-        credentials: 'same-origin',
-        uri: '/graphql',
-      }),
-    ]),
-  })
-
-  const Init = (
+const Init = (
+  <React.StrictMode>
     <ApolloProvider client={apolloClient}>
-      <Router basename={APP_BASE}>
+      <Router>
         <HelmetProvider>
           <Layout />
         </HelmetProvider>
       </Router>
     </ApolloProvider>
-  )
+  </React.StrictMode>
+)
 
-  // loadableReady(() => {
-  const el = document.getElementById(MOUNT)
-  if (! el) throw new Error(`could not find render element with id ${MOUNT}`)
-  console.log('loading')
-  ReactDOM.hydrate(<App />, Init)
-  // })
-}
-
-main()
+ReactDOM.render(Init, document.getElementById(MOUNT))
