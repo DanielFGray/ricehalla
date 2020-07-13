@@ -1,0 +1,6 @@
+mutation DeleteDesktop($desktopId: UUID!) {
+  deleteDesktop(input: { id: $desktopId }) {
+    deletedDesktopNodeId
+  }
+}
+

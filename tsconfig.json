@@ -1,26 +1,49 @@
 {
   "compilerOptions": {
-    "target": "es5",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
-    "allowJs": true,
-    "checkJs": true,
-    "skipLibCheck": true,
-    "esModuleInterop": true,
+    "composite": true,
+    "incremental": true,
+    "noEmitOnError": true,
+
+    "allowJs": false,
     "allowSyntheticDefaultImports": true,
-    "strict": true,
-    "forceConsistentCasingInFileNames": true,
+    "esModuleInterop": true,
+    "jsx": "preserve",
+    "lib": ["dom", "es2017"],
+    "target": "esnext",
     "module": "esnext",
     "moduleResolution": "node",
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitAny": true,
+    "preserveConstEnums": true,
     "resolveJsonModule": true,
-    "isolatedModules": true,
+    "sourceMap": true,
+    "removeComments": false,
+    "strict": true,
+    "strictNullChecks": true,
+    "importHelpers": true,
+    "suppressImplicitAnyIndexErrors": true,
+    "preserveWatchOutput": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+
     "noEmit": true,
-    "jsx": "react"
+    "declaration": true,
+    "declarationMap": true,
+    "baseUrl": ".",
+    "paths": {
+      "@app/*": ["@app/*"]
+    }
   },
-  "include": [
-    "src/**/*"
+  "include": [],
+  "exclude": ["@app/e2e"],
+  "references": [
+    { "path": "@app/config" },
+    { "path": "@app/components" },
+    { "path": "@app/graphql" },
+    { "path": "@app/server" },
+    { "path": "@app/worker" }
   ]
 }

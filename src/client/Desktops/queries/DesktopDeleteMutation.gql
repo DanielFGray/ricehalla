@@ -1,5 +1,0 @@
-mutation deleteDesktop ($id: UUID!) {
-  deleteDesktop(input: { id: $id }) {
-    deletedDesktopNodeId
-  }
-}

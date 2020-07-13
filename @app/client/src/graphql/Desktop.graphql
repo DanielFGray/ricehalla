@@ -1,0 +1,27 @@
+query Desktop($desktopId: UUID!) {
+  desktop(id: $desktopId) {
+    id
+    description
+    tags
+    title
+    url
+    createdAt
+    updatedAt
+    user {
+      username
+    }
+    desktopCommentsByPostId {
+      nodes {
+        body
+        id
+        parentId
+        postId
+        createdAt
+        updatedAt
+        user {
+          username
+        }
+      }
+    }
+  }
+}

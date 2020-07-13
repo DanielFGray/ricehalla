@@ -1,0 +1,18 @@
+query DesktopList {
+  desktops {
+    nodes {
+      id
+      title
+      url
+      tags
+      createdAt
+      updatedAt
+      user {
+        username
+      }
+      desktopCommentsByPostId {
+        totalCount
+      }
+    }
+  }
+}

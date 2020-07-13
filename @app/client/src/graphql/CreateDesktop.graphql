@@ -1,0 +1,23 @@
+mutation CreateDesktop(
+  $title: String!
+  $description: String
+  $url: Url!
+  $tags: [Tag]
+) {
+  createDesktop(
+    input: {
+      desktop: {
+        title: $title
+        description: $description
+        url: $url
+        tags: $tags
+      }
+    }
+  ) {
+    desktop {
+      id
+      createdAt
+    }
+  }
+}
+
