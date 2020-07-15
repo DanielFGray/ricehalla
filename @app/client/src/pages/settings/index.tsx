@@ -11,7 +11,6 @@ import {
   tailFormItemLayout,
 } from "@app/lib";
 import { Alert, Button, Form, Input, PageHeader } from "antd";
-import { useForm } from "antd/lib/form/util";
 import { ApolloError } from "apollo-client";
 import { NextPage } from "next";
 import { Store } from "rc-field-form/lib/interface";
@@ -61,7 +60,7 @@ function ProfileSettingsForm({
   error,
   setError,
 }: ProfileSettingsFormProps) {
-  const [form] = useForm();
+  const [form] = Form.useForm();
   const [updateUser] = useUpdateUserMutation();
   const [success, setSuccess] = useState(false);
 
@@ -136,10 +135,7 @@ function ProfileSettingsForm({
         >
           <Input />
         </Form.Item>
-        <Form.Item
-          label="Avatar URL"
-          name="avatarUrl"
-        >
+        <Form.Item label="Avatar URL" name="avatarUrl">
           <Input />
         </Form.Item>
         <Form.Item

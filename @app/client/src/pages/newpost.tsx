@@ -1,7 +1,4 @@
-import {
-  AuthRestrict,
-  SharedLayout,
-} from "@app/components";
+import { AuthRestrict, SharedLayout } from "@app/components";
 import {
   DesktopListDocument,
   DesktopListQueryResult,
@@ -16,29 +13,25 @@ import {
   tailFormItemLayout,
 } from "@app/lib";
 import { Alert, Button, Form, Input, Select } from "antd";
-import { useForm } from "antd/lib/form/util";
 import { ApolloError } from "apollo-client";
 import { NextPage } from "next";
 import Router from "next/router";
 import { Store } from "rc-field-form/lib/interface";
-import React, { useCallback, useEffect, useRef,useState } from "react"
+import React, { useCallback, useEffect, useRef, useState } from "react";
 
 const NewPost: NextPage = () => {
   const [error, setError] = useState<Error | ApolloError | null>(null);
   const query = useSharedQuery();
   const [post] = useCreateDesktopMutation();
-  const [form] = useForm();
+  const [form] = Form.useForm();
 
-  const handleValuesChange = useCallback(
-    (changedValues) => {
-      // TODO: test url doesn't 404?
-    },
-    [form]
-  );
+  const handleValuesChange = useCallback((changedValues) => {
+    // TODO: test url doesn't 404?
+  }, []);
 
   const handleSubmit = useCallback(
     async (values: Store) => {
-      console.log(values)
+      console.log(values);
       try {
         await post({
           variables: {
@@ -48,8 +41,10 @@ const NewPost: NextPage = () => {
             tags: values.tags,
           },
           update: (proxy, result) => {
-            const cache = proxy.readQuery<DesktopListQueryResult>({ query: DesktopListDocument })
-            console.log(cache)
+            const cache = proxy.readQuery<DesktopListQueryResult>({
+              query: DesktopListDocument,
+            });
+            console.log(cache, result);
             // const DesktopList = [
             //   result?.data.DesktopCreate,
             //   ...cache?.DesktopList,
@@ -58,9 +53,9 @@ const NewPost: NextPage = () => {
             //   query: DesktopListDocument,
             //   data: { DesktopList },
             // })
+            Router.push("/");
           },
         });
-        Router.push('/')
       } catch (e) {
         const code = getCodeFromError(e);
         const exception = getExceptionFromError(e);
@@ -71,19 +66,15 @@ const NewPost: NextPage = () => {
             {
               name: "title",
               value: form.getFieldValue("title"),
-              errors: [
-                "Titles must not be empty",
-              ],
+              errors: ["Titles must not be empty"],
             },
           ]);
         } else {
           setError(e);
         }
       }
-    }, [
-      form,
-      post
-    ]
+    },
+    [form, post]
   );
 
   const focusElement = useRef<Input>(null);
@@ -113,16 +104,14 @@ const NewPost: NextPage = () => {
               required: true,
               message: "Please input your title.",
               whitespace: true,
-            }, {
+            },
+            {
               min: 1,
               message: "Title must not be empty",
             },
           ]}
         >
-          <Input
-            autoComplete="title"
-            data-cy="postrice-input-title"
-          />
+          <Input autoComplete="title" data-cy="postrice-input-title" />
         </Form.Item>
         <Form.Item
           label={<span>URL</span>}
@@ -132,29 +121,25 @@ const NewPost: NextPage = () => {
               required: true,
               message: "Please enter a URL",
               whitespace: false,
-            }, {
+            },
+            {
               min: 1,
               message: "URL must not be empty",
             },
           ]}
         >
-          <Input
-            autoComplete="url"
-            data-cy="postrice-input-url"
-          />
+          <Input autoComplete="url" data-cy="postrice-input-url" />
         </Form.Item>
-        <Form.Item
-          label={<span>Description</span>}
-          name="description"
-        >
+        <Form.Item label={<span>Description</span>} name="description">
           <Input.TextArea rows={5} />
         </Form.Item>
-        <Form.Item
-          label="Tags"
-          name="tags"
-          rules={[]}
-        >
-          <Select showArrow mode="tags" style={{ width: '100%' }} placeholder="enter tags"/>
+        <Form.Item label="Tags" name="tags" rules={[]}>
+          <Select
+            showArrow
+            mode="tags"
+            style={{ width: "100%" }}
+            placeholder="enter tags"
+          />
         </Form.Item>
         {error ? (
           <Form.Item label="Error">
@@ -182,7 +167,7 @@ const NewPost: NextPage = () => {
         </Form.Item>
       </Form>
     </SharedLayout>
-  )
-}
+  );
+};
 
-export default NewPost
+export default NewPost;

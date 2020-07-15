@@ -17,7 +17,6 @@ import {
   resetWebsocketConnection,
 } from "@app/lib";
 import { Alert, Button, Form, Input } from "antd";
-import { useForm } from "antd/lib/form/util";
 import { ApolloError } from "apollo-client";
 import { NextPage } from "next";
 import Link from "next/link";
@@ -131,7 +130,7 @@ function LoginForm({
   error,
   setError,
 }: LoginFormProps) {
-  const [form] = useForm();
+  const [form] = Form.useForm();
   const [login] = useLoginMutation({});
   const client = useApolloClient();
 

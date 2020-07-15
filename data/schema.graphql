@@ -190,6 +190,47 @@ type CreateOrganizationPayload {
   query: Query
 }
 
+"""All input for the create `StarOnPost` mutation."""
+input CreateStarOnPostInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `StarOnPost` to be created by this mutation."""
+  starOnPost: StarOnPostInput!
+}
+
+"""The output of our create `StarOnPost` mutation."""
+type CreateStarOnPostPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """Reads a single `Desktop` that is related to this `StarOnPost`."""
+  post: Desktop
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `StarOnPost` that was created by this mutation."""
+  starOnPost: StarOnPost
+
+  """An edge for our `StarOnPost`. May be used by Relay 1."""
+  starOnPostEdge(
+    """The method to use when ordering `StarOnPost`."""
+    orderBy: [StarOnPostsOrderBy!] = [NATURAL]
+  ): StarOnPostsEdge
+
+  """Reads a single `User` that is related to this `StarOnPost`."""
+  user: User
+}
+
 """All input for the create `UserEmail` mutation."""
 input CreateUserEmailInput {
   """
@@ -444,6 +485,35 @@ type Desktop {
     orderBy: [DesktopCommentsOrderBy!] = [PRIMARY_KEY_ASC]
   ): DesktopCommentsConnection!
   id: UUID!
+
+  """Reads and enables pagination through a set of `StarOnPost`."""
+  starOnPostsByPostId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: StarOnPostCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `StarOnPost`."""
+    orderBy: [StarOnPostsOrderBy!] = [NATURAL]
+  ): StarOnPostsConnection!
   tags: [Tag]!
   title: String!
   updatedAt: Datetime!
@@ -809,6 +879,14 @@ type Mutation {
     """
     input: CreateOrganizationInput!
   ): CreateOrganizationPayload
+
+  """Creates a single `StarOnPost`."""
+  createStarOnPost(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateStarOnPostInput!
+  ): CreateStarOnPostPayload
 
   """Creates a single `UserEmail`."""
   createUserEmail(
@@ -1322,6 +1400,54 @@ type Query {
     """The method to use when ordering `Organization`."""
     orderBy: [OrganizationsOrderBy!] = [PRIMARY_KEY_ASC]
   ): OrganizationsConnection
+
+  """Reads and enables pagination through a set of `StarOnPost`."""
+  starOnPosts(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: StarOnPostCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `StarOnPost`."""
+    orderBy: [StarOnPostsOrderBy!] = [NATURAL]
+  ): StarOnPostsConnection
+  topTags(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+  ): TopTagsConnection!
   user(id: UUID!): User
   userAuthentication(id: UUID!): UserAuthentication
   userByUsername(username: String!): User
@@ -1470,6 +1596,68 @@ type ResetPasswordPayload {
   success: Boolean
 }
 
+type StarOnPost {
+  """Reads a single `Desktop` that is related to this `StarOnPost`."""
+  post: Desktop
+  postId: UUID!
+
+  """Reads a single `User` that is related to this `StarOnPost`."""
+  user: User
+  userId: UUID!
+}
+
+"""
+A condition to be used against `StarOnPost` object types. All fields are tested
+for equality and combined with a logical ‘and.’
+"""
+input StarOnPostCondition {
+  """Checks for equality with the object’s `postId` field."""
+  postId: UUID
+
+  """Checks for equality with the object’s `userId` field."""
+  userId: UUID
+}
+
+"""An input for mutations affecting `StarOnPost`"""
+input StarOnPostInput {
+  postId: UUID!
+}
+
+"""A connection to a list of `StarOnPost` values."""
+type StarOnPostsConnection {
+  """
+  A list of edges which contains the `StarOnPost` and cursor to aid in pagination.
+  """
+  edges: [StarOnPostsEdge!]!
+
+  """A list of `StarOnPost` objects."""
+  nodes: [StarOnPost!]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `StarOnPost` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `StarOnPost` edge in the connection."""
+type StarOnPostsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `StarOnPost` at the end of the edge."""
+  node: StarOnPost!
+}
+
+"""Methods to use when ordering `StarOnPost`."""
+enum StarOnPostsOrderBy {
+  NATURAL
+  POST_ID_ASC
+  POST_ID_DESC
+  USER_ID_ASC
+  USER_ID_DESC
+}
+
 """
 The root subscription type: contains realtime events you can subscribe to with the `subscription` operation.
 """
@@ -1479,6 +1667,35 @@ type Subscription {
 }
 
 scalar Tag
+
+"""A `TopTagsRecord` edge in the connection."""
+type TopTagEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `TopTagsRecord` at the end of the edge."""
+  node: TopTagsRecord!
+}
+
+"""A connection to a list of `TopTagsRecord` values."""
+type TopTagsConnection {
+  """
+  A list of edges which contains the `TopTagsRecord` and cursor to aid in pagination.
+  """
+  edges: [TopTagEdge!]!
+
+  """A list of `TopTagsRecord` objects."""
+  nodes: [TopTagsRecord!]!
+
+  """The count of *all* `TopTagsRecord` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""The return type of our `topTags` query."""
+type TopTagsRecord {
+  count: String
+  tags: Int
+}
 
 """All input for the `transferOrganizationBillingContact` mutation."""
 input TransferOrganizationBillingContactInput {
@@ -1819,6 +2036,35 @@ type User {
     """The method to use when ordering `OrganizationMembership`."""
     orderBy: [OrganizationMembershipsOrderBy!] = [PRIMARY_KEY_ASC]
   ): OrganizationMembershipsConnection!
+
+  """Reads and enables pagination through a set of `StarOnPost`."""
+  starOnPosts(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: StarOnPostCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `StarOnPost`."""
+    orderBy: [StarOnPostsOrderBy!] = [NATURAL]
+  ): StarOnPostsConnection!
   updatedAt: Datetime!
 
   """Reads and enables pagination through a set of `UserAuthentication`."""

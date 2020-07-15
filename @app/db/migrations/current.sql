@@ -1757,11 +1757,8 @@ create index on app_public.desktops (user_id);
 comment on column app_public.desktops.ttags is '@name tags';
 
 create function app_public.desktops_by_tags(tags text[]) returns app_public.desktops as $$
-declare
-  v_matched_desktops app_public.desktops;
 begin
-  select * into v_matched_desktops from app_public.desktops where ttags @> tags::app_public.tag[];
-  return v_matched_desktops;
+  select * from app_public.desktops where ttags @> tags::app_public.tag[];
 end;
 $$ language plpgsql stable;
 grant execute on function app_public.desktops_by_tags(text[]) to :DATABASE_VISITOR;
@@ -1781,23 +1778,42 @@ grant
   delete
 on app_public.desktops to :DATABASE_VISITOR;
 
+create function top_tags() returns table (count text, tags int) as $$
+begin
+  select unnest(ttags) as tags, count(*) from app_public.desktops group by tags order by count desc;
+end;
+$$ language plpgsql stable;
+grant execute on function app_public.top_tags() to :DATABASE_VISITOR;
+
 create trigger _100_timestamps
   before update on app_public.desktops
   for each row
   execute procedure app_private.tg__timestamps();
 
-create table app_public.user_star_post (
+create table app_public.star_on_post (
   user_id uuid not null default app_public.current_user_id() references app_public.users on delete cascade,
   post_id uuid not null references app_public.desktops on delete cascade
 );
-create index on app_public.user_star_post(post_id);
-create unique index on app_public.user_star_post (user_id, post_id);
+create index on app_public.star_on_post(post_id);
+create unique index on app_public.star_on_post (user_id, post_id);
+
+alter table app_public.star_on_post enable row level security;
+create policy select_desktops on app_public.star_on_post for select using (true);
+create policy insert_own_desktops on app_public.star_on_post
+  for insert with check (user_id = app_public.current_user_id());
+create policy delete_own_desktops on app_public.star_on_post
+  for delete using (user_id = app_public.current_user_id());
+grant
+  select,
+  insert (post_id),
+  delete
+on app_public.star_on_post to :DATABASE_VISITOR;
 
 create table app_public.desktop_comments (
   id         uuid primary key default gen_random_uuid(),
   post_id    uuid not null references app_public.desktops on delete cascade,
   user_id    uuid not null default app_public.current_user_id() references app_public.users on delete cascade,
-  parent_id  uuid references app_public.desktop_comments,
+  parent_id  uuid references app_public.desktop_comments on delete cascade,
   body       text not null,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()

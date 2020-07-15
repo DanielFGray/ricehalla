@@ -1,4 +1,4 @@
-import { CrownOutlined, DownOutlined } from "@ant-design/icons";
+import { CrownOutlined, DownOutlined, HeartFilled } from "@ant-design/icons";
 import { QueryResult } from "@apollo/react-common";
 import { useApolloClient } from "@apollo/react-hooks";
 import { companyName, projectName } from "@app/config";
@@ -252,7 +252,9 @@ export function SharedLayout({
                   style={{ whiteSpace: "nowrap" }}
                 >
                   <Avatar>
-                    {(data.currentUser.username && data.currentUser.username[0]) || "?"}
+                    {(data.currentUser.username &&
+                      data.currentUser.username[0]) ||
+                      "?"}
                   </Avatar>
                   <Warn okay={data.currentUser.isVerified}>
                     <span style={{ marginLeft: 8, marginRight: 8 }}>
@@ -286,22 +288,10 @@ export function SharedLayout({
           }}
         >
           <Text>
-            Copyright &copy; {new Date().getFullYear()} {companyName}. All
-            rights reserved.
-            {process.env.T_AND_C_URL ? (
-              <span>
-                {" "}
-                <a
-                  style={{ textDecoration: "underline" }}
-                  href={process.env.T_AND_C_URL}
-                >
-                  Terms and conditions
-                </a>
-              </span>
-            ) : null}
+            Made with <HeartFilled color="red" />
           </Text>
           <Text>
-            Powered by{" "}
+            {"Powered by "}
             <a
               style={{ textDecoration: "underline" }}
               href="https://graphile.org/postgraphile"

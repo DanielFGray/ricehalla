@@ -4,6 +4,7 @@ export * from "./ErrorOccurred";
 export * from "./FourOhFour";
 export * from "./OrganizationSettingsLayout";
 export * from "./PasswordStrength";
+export * from "./Post";
 export * from "./Redirect";
 export * from "./SettingsLayout";
 export * from "./SharedLayout";

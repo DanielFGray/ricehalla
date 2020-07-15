@@ -3,4 +3,3 @@ mutation DeleteDesktop($desktopId: UUID!) {
     deletedDesktopNodeId
   }
 }
-

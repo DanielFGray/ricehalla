@@ -1,108 +1,263 @@
-import {StarOutlined} from "@ant-design/icons";
-import { SharedLayout, Stringify } from "@app/components";
-import { useDesktopQuery, usePostCommentMutation,useSharedQuery } from "@app/graphql";
-import { Avatar, Button, Comment, Form, Input, List, Skeleton, Space, Tag } from "antd";
+import {
+  DeleteOutlined,
+  EditOutlined,
+  ExclamationCircleOutlined,
+  StarOutlined,
+} from "@ant-design/icons";
+import { Post, Redirect, SharedLayout, Stringify } from "@app/components";
+import {
+  Desktop,
+  DesktopComment,
+  DesktopDocument,
+  useDeleteDesktopCommentMutation,
+  useDesktopQuery,
+  usePostCommentMutation,
+  User,
+  useSharedQuery,
+} from "@app/graphql";
+import {
+  extractError,
+  getCodeFromError,
+  getExceptionFromError,
+} from "@app/lib";
+import {
+  Alert,
+  Avatar,
+  Button,
+  Comment,
+  Form,
+  Input,
+  List,
+  Modal,
+  Skeleton,
+  Space,
+} from "antd";
 import { ApolloError } from "apollo-client";
 import { NextPage } from "next";
-import Link from "next/link"
-import { useRouter } from "next/router"
+import Router, { useRouter } from "next/router";
 import { Store } from "rc-field-form/lib/interface";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 
-const Desktop: NextPage = () => {
-  const [postError, setError] = useState<Error | ApolloError | null>(null);
-  const router = useRouter()
+const DeletableComment: React.FC<
+  Pick<DesktopComment, "id" | "body"> & {
+    user?: null | Pick<User, "username" | "avatarUrl">;
+    currentUser?: string;
+  }
+> = ({ id, body, user, currentUser, children }) => {
+  const [deleteComment] = useDeleteDesktopCommentMutation({
+    variables: { id },
+    update: (proxy) => {
+      const query = DesktopDocument;
+      const data = proxy.readQuery({ query, variables: { desktopId: id } });
+      console.log(data);
+      /* proxy.writeQuery({ query, data }) */
+    },
+  });
+  return (
+    <Comment
+      key={id}
+      actions={[
+        <Space key="comment-nested-reply-to">Reply</Space>,
+        <Space key="star">
+          <StarOutlined />
+        </Space>,
+        ...(user?.username === currentUser
+          ? [
+              <Space key="edit">
+                <EditOutlined />
+              </Space>,
+              <Space key="delete">
+                <DeleteOutlined
+                  onClick={() => {
+                    Modal.confirm({
+                      title: "Are you sure you want to delete this comment?",
+                      icon: <ExclamationCircleOutlined />,
+                      onOk: async () => deleteComment(),
+                    });
+                  }}
+                />
+              </Space>,
+            ]
+          : []),
+      ]}
+      author={<a>{user?.username}</a>}
+      avatar={<Avatar>{user?.avatarUrl || user?.username[0]}</Avatar>}
+      content={
+        <p>
+          {body}
+          {children}
+        </p>
+      }
+    />
+  );
+};
+
+const Rice: NextPage = () => {
+  const router = useRouter();
   const query = useSharedQuery();
-  const [postComment] = usePostCommentMutation()
-  const { slug } = router.query
+  const [form] = Form.useForm();
+  const [postComment] = usePostCommentMutation();
+  const [postError, setError] = useState<Error | ApolloError | null>(null);
+
+  const { slug } = router.query;
   const { data, error, loading } = useDesktopQuery({
-    variables: { desktopId: slug },
-  })
+    variables: { desktopId: slug as string },
+  });
 
   const handleSubmit = useCallback(
     async (values: Store) => {
-      console.log(values)
+      if (!data?.desktop?.id) return null;
+      const id = data?.desktop?.id;
       try {
         await postComment({
           variables: {
-            postId: data?.desktop?.id,
+            postId: id,
             body: values.body,
           },
-        })
+          update: (proxy) => {
+            const cache = proxy.readQuery<Desktop[]>({
+              query: DesktopDocument,
+              variables: { desktopId: id },
+            })!;
+            const idx = cache.findIndex((e) => e.id === id);
+            console.log(cache, idx);
+            /* if (idx < 0) return */
+            /* const DesktopList = [ */
+            /*   ...cache.DesktopList.slice(0, idx), */
+            /*   ...cache.DesktopList.slice(idx + 1), */
+            /* ] */
+            /* proxy.writeQuery({ */
+            /*   query: DesktopDocument, */
+            /*   data: { DesktopList }, */
+            /* }) */
+          },
+        });
       } catch (e) {
-        setError(e);
+        const code = getCodeFromError(e);
+        const exception = getExceptionFromError(e);
+        const fields: any = exception && exception["fields"];
+
+        if (code === "23514") {
+          form.setFields([
+            {
+              name: "title",
+              value: form.getFieldValue("title"),
+              errors: ["Titles must not be empty"],
+            },
+          ]);
+        } else {
+          setError(e);
+        }
       }
     },
-    [data?.desktop?.id, postComment],
-  )
+    [data, form, postComment]
+  );
 
-  if (loading || !data) return <Skeleton />;
-  if (error) return Stringify(error.message || error)
-  if (! data?.desktop) return Stringify(data);
+  useEffect(() => {
+    if (data?.desktop === null) {
+      Router.replace("/");
+    }
+  }, [data]);
 
-  const { desktop } = data
+  const comments = React.useMemo(() => {
+    const nodes = data?.desktop?.desktopCommentsByPostId?.nodes;
+
+    if (!(nodes && Array.isArray(nodes))) return [];
+
+    const items = new Map<string, typeof nodes[0] & { replies: typeof nodes }>(
+      nodes.map(({ id, ...item }) => [id, { ...item, id, replies: [] }])
+    );
+
+    for (const [_, item] of items) {
+      if (item.parentId !== null || item.parentId !== data?.desktop?.id) {
+        const parent = items.get(item.parentId);
+        if (parent) {
+          parent.replies.push(item);
+        }
+      }
+    }
+
+    return Array.from(items.values());
+  }, [data]);
+
+  const code = getCodeFromError(postError);
 
   return (
-    <SharedLayout
-      title=""
-      query={query}
-    >
+    <SharedLayout title="" query={query}>
+      {error && (
+        <Alert
+          type="error"
+          message="ope"
+          description={Stringify(error.message || error)}
+        />
+      )}
       <List itemLayout="vertical" size="large">
-        <List.Item
-          key={desktop.id}
-          actions={[
-            <Space key="star"><StarOutlined /></Space>,
-          ]}
-          extra={
-            <a href={desktop.url} key={`${desktop.id}_${desktop.url}`}>
-              <img src={desktop.url} style={{ maxHeight: "150px" }}/>
-            </a>
-          }
-        >
-          <List.Item.Meta
-            title={<Link href="/desktop/[slug]" as={`/desktop/${desktop.id}`}><a>{desktop.title}</a></Link>}
-            description={desktop.tags.length > 0 && (
-              <>
-                <div>
-                  by {desktop.user?.username}
-                </div>
-                {desktop.tags.map(tag => <Tag.CheckableTag checked={false} key={tag}>{tag}</Tag.CheckableTag>)}
-              </>
-            )}
+        {loading || !data?.desktop ? (
+          <List.Item extra={<Skeleton.Image />}>
+            <Skeleton active />
+            <Skeleton active title={false} />
+          </List.Item>
+        ) : (
+          <Post
+            {...data.desktop}
+            commentCount={data.desktop.desktopCommentsByPostId.totalCount}
           />
-        </List.Item>
+        )}
         <List.Item>
-          <Form onFinish={handleSubmit} onValuesChange={e => console.log(e)}>
+          <Form onFinish={handleSubmit} onValuesChange={(e) => console.log(e)}>
             <Form.Item name="body">
-              <Input.TextArea rows={3} placeholder="say something nice" />
+              <Input.TextArea
+                disabled={loading || Boolean(error)}
+                rows={3}
+                placeholder="say something nice"
+              />
             </Form.Item>
+            {postError ? (
+              <Form.Item label="Error">
+                <Alert
+                  type="error"
+                  message="Post failed"
+                  description={
+                    <span>
+                      {extractError(postError).message}
+                      {code ? (
+                        <span>
+                          {" "}
+                          (Error code: <code>ERR_{code}</code>)
+                        </span>
+                      ) : null}
+                    </span>
+                  }
+                />
+              </Form.Item>
+            ) : null}
             <Form.Item>
-              <Button htmlType="submit" data-cy="postcomment-submit-button">
-              Post
+              <Button
+                disabled={loading || Boolean(error)}
+                htmlType="submit"
+                data-cy="postcomment-submit-button"
+              >
+                Post
               </Button>
             </Form.Item>
           </Form>
         </List.Item>
-        {desktop.desktopCommentsByPostId.nodes.map(x => (
-          <Comment
-            key={x.id}
-            actions={[<span key="comment-nested-reply-to">Reply to</span>]}
-            author={<a>{x?.user?.username}</a>}
-            avatar={
-              <Avatar>
-                {x?.user?.username[0]}
-              </Avatar>
-            }
-            content={
-              <p>
-                {x.body}
-              </p>
-            }
-          />
-        ))}
+        {loading ? (
+          <List.Item>
+            <Skeleton active avatar />
+          </List.Item>
+        ) : (
+          comments.map((x) => (
+            <DeletableComment
+              key={x.id}
+              {...x}
+              currentUser={query.data?.currentUser?.username}
+            />
+          ))
+        )}
       </List>
     </SharedLayout>
-  )
+  );
 };
 
-export default Desktop;
+export default Rice;

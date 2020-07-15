@@ -9,8 +9,12 @@ query DesktopList {
       updatedAt
       user {
         username
+        avatarUrl
       }
       desktopCommentsByPostId {
+        totalCount
+      }
+      starOnPostsByPostId {
         totalCount
       }
     }

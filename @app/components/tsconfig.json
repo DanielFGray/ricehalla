@@ -9,7 +9,9 @@
     "lib": ["dom", "dom.iterable", "esnext"],
     "target": "es5",
     "module": "commonjs",
-    "jsx": "react"
+    "jsx": "react",
+    "strict": true,
+    "downlevelIteration": true
   },
   "include": ["src/**/*.ts", "src/**/*.tsx"],
   "references": [

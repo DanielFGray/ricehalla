@@ -4,11 +4,14 @@ documents: "../client/src/**/*.graphql"
 config:
   scalars:
     Datetime: "string"
-    JSON: "{ [key: string]: any }"
-  noGraphQLTag: false
+    UUID: "string"
+    Url: "string"
+    Tag: "string"
+    JSON: "{ [key: string]: Mi }"
   withHOC: false
   withComponent: false
   withHooks: true
+  immutableTypes: true
 generates:
   index.tsx:
     plugins:

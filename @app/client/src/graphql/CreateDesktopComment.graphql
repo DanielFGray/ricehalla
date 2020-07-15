@@ -1,8 +1,9 @@
 mutation PostComment($postId: UUID!, $body: String!) {
-  createDesktopComment(input: { desktopComment: { postId: $postId, body: $body } }) {
+  createDesktopComment(
+    input: { desktopComment: { postId: $postId, body: $body } }
+  ) {
     desktopComment {
       id
     }
   }
 }
-

@@ -9,8 +9,13 @@ query Desktop($desktopId: UUID!) {
     updatedAt
     user {
       username
+      avatarUrl
+    }
+    starOnPostsByPostId {
+      totalCount
     }
     desktopCommentsByPostId {
+      totalCount
       nodes {
         body
         id
@@ -20,6 +25,7 @@ query Desktop($desktopId: UUID!) {
         updatedAt
         user {
           username
+          avatarUrl
         }
       }
     }

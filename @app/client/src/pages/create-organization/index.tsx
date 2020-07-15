@@ -12,7 +12,6 @@ import {
   tailFormItemLayout,
 } from "@app/lib";
 import { Alert, Button, Col, Form, Input, PageHeader, Row, Spin } from "antd";
-import { useForm } from "antd/lib/form/util";
 import Text from "antd/lib/typography/Text";
 import { ApolloError } from "apollo-client";
 import { debounce } from "lodash";
@@ -24,7 +23,7 @@ import slugify from "slugify";
 const CreateOrganizationPage: NextPage = () => {
   const [formError, setFormError] = useState<Error | ApolloError | null>(null);
   const query = useSharedQuery();
-  const [form] = useForm();
+  const [form] = Form.useForm();
   const [slug, setSlug] = useState("");
   const [
     lookupOrganizationBySlug,

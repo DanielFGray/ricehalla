@@ -17,7 +17,6 @@ import {
   tailFormItemLayout,
 } from "@app/lib";
 import { Alert, Button, Form, Input, Tooltip } from "antd";
-import { useForm } from "antd/lib/form/util";
 import { ApolloError } from "apollo-client";
 import { NextPage } from "next";
 import Router from "next/router";
@@ -50,7 +49,7 @@ const Register: NextPage<RegisterProps> = ({ next: rawNext }) => {
   const [register] = useRegisterMutation({});
   const client = useApolloClient();
   const [confirmDirty, setConfirmDirty] = useState(false);
-  const [form] = useForm();
+  const [form] = Form.useForm();
 
   const handleSubmit = useCallback(
     async (values: Store) => {

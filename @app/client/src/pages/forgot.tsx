@@ -3,7 +3,6 @@ import { AuthRestrict, SharedLayout } from "@app/components";
 import { useForgotPasswordMutation, useSharedQuery } from "@app/graphql";
 import { extractError, getCodeFromError } from "@app/lib";
 import { Alert, Button, Form, Input } from "antd";
-import { useForm } from "antd/lib/form/util";
 import { ApolloError } from "apollo-client";
 import { NextPage } from "next";
 import Link from "next/link";
@@ -14,7 +13,7 @@ const ForgotPassword: NextPage = () => {
   const [error, setError] = useState<Error | ApolloError | null>(null);
   const query = useSharedQuery();
 
-  const [form] = useForm();
+  const [form] = Form.useForm();
   const [forgotPassword] = useForgotPasswordMutation();
   const [successfulEmail, setSuccessfulEmail] = useState<string | null>(null);
 
