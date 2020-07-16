@@ -1,0 +1,5 @@
+mutation createStarOnPost($id: UUID!) {
+  createStarOnPost(input: { starOnPost: { postId: $id } }) {
+    clientMutationId
+  }
+}

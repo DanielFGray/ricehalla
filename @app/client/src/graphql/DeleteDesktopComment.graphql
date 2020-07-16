@@ -1,0 +1,5 @@
+mutation deleteDesktopComment($id: UUID!) {
+  deleteDesktopComment(input: { id: $id }) {
+    clientMutationId
+  }
+}
