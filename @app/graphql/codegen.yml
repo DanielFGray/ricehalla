@@ -7,11 +7,11 @@ config:
     UUID: "string"
     Url: "string"
     Tag: "string"
-    JSON: "{ [key: string]: Mi }"
+    JSON: "{ [key: string]: any }"
   withHOC: false
   withComponent: false
   withHooks: true
-  immutableTypes: true
+  # immutableTypes: true
 generates:
   index.tsx:
     plugins:

@@ -97,7 +97,7 @@ const InvitationAcceptInner: FC<InvitationAcceptInnerProps> = (props) => {
     // Call mutation
     acceptInvite({
       variables: {
-        id,
+        id: id!,
         code,
       },
     }).then(

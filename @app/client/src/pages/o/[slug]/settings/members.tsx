@@ -197,13 +197,16 @@ const OrganizationMemberListItem: FC<OrganizationMemberListItemProps> = (
 ) => {
   const { node, organization, currentUser } = props;
 
+  const userId = node.user?.id ?? '0'
+  const organizationId = organization.id ?? '0'
+
   const [removeMember] = useRemoveFromOrganizationMutation();
   const handleRemove = useCallback(async () => {
     try {
       await removeMember({
         variables: {
-          organizationId: organization.id,
-          userId: node.user?.id ?? 0,
+          organizationId,
+          userId,
         },
         refetchQueries: ["OrganizationMembers"],
       });
@@ -217,8 +220,8 @@ const OrganizationMemberListItem: FC<OrganizationMemberListItemProps> = (
     try {
       await transferOwnership({
         variables: {
-          organizationId: organization.id,
-          userId: node.user?.id ?? 0,
+          organizationId,
+          userId,
         },
         refetchQueries: ["OrganizationMembers"],
       });
@@ -232,8 +235,8 @@ const OrganizationMemberListItem: FC<OrganizationMemberListItemProps> = (
     try {
       await transferBilling({
         variables: {
-          organizationId: organization.id,
-          userId: node.user?.id ?? 0,
+          organizationId,
+          userId,
         },
         refetchQueries: ["OrganizationMembers"],
       });

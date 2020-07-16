@@ -169,7 +169,7 @@ const Rice: NextPage = () => {
     );
 
     for (const [_, item] of items) {
-      if (item.parentId !== null || item.parentId !== data?.desktop?.id) {
+      if (item.parentId) {
         const parent = items.get(item.parentId);
         if (parent) {
           parent.replies.push(item);
